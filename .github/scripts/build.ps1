@@ -15,6 +15,15 @@ Copy-Item -Path "$source/admin/css/*.*" -Destination $flatDest -Force -ErrorActi
 Copy-Item -Path "$source/admin/js/*.*" -Destination $flatDest -Force -ErrorAction SilentlyContinue
 Copy-Item -Path "$source/admin/images/*.*" -Destination $flatDest -Force -ErrorAction SilentlyContinue
 
+# Create .htaccess to preserve Authorization header on Awardspace
+$htaccessContent = @"
+RewriteEngine On
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=`$1
+"@
+$htaccessContent | Set-Content "$flatDest/.htaccess"
+
 # Update Paths in Flat Files
 $phpFiles = Get-ChildItem -Path $flatDest -Filter "*.php"
 foreach ($file in $phpFiles) {

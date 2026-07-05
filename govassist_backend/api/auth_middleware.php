@@ -4,15 +4,24 @@ require_once 'jwt.php';
 
 function getAuthenticatedUser() {
     $headers = apache_request_headers();
+    $authHeader = null;
+    
+    if (isset($headers['Authorization'])) {
+        $authHeader = $headers['Authorization'];
+    } elseif (isset($headers['authorization'])) {
+        $authHeader = $headers['authorization'];
+    } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+    } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    }
     
     // Check if Authorization header is set
-    if (!isset($headers['Authorization']) && !isset($headers['authorization'])) {
+    if (!$authHeader) {
         http_response_code(401);
         echo json_encode(['error' => 'Unauthorized. Missing Authorization header.']);
         exit();
     }
-    
-    $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : $headers['authorization'];
     
     // Check if it's a Bearer token
     if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
