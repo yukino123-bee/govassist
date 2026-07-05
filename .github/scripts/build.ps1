@@ -9,6 +9,7 @@ if (Test-Path $flatDest) { Remove-Item -Path $flatDest -Recurse -Force }
 New-Item -ItemType Directory -Path $flatDest | Out-Null
 
 Copy-Item -Path "$source/api/*.php" -Destination $flatDest -Force
+if (Test-Path "$source/vendor") { Copy-Item -Path "$source/vendor" -Destination "$flatDest/vendor" -Recurse -Force }
 Copy-Item -Path "$source/admin/*.html" -Destination $flatDest -Force
 Copy-Item -Path "$source/api/admin/*.php" -Destination $flatDest -Force -ErrorAction SilentlyContinue
 Copy-Item -Path "$source/admin/css/*.*" -Destination $flatDest -Force -ErrorAction SilentlyContinue
@@ -51,6 +52,7 @@ foreach ($file in $phpFiles) {
                         -replace "'\.\./db\.php'", "'db.php'" `
                         -replace "'\.\./auth_middleware\.php'", "'auth_middleware.php'" `
                         -replace "'\.\./jwt\.php'", "'jwt.php'" `
+                        -replace "'/\.\./vendor/autoload\.php'", "'/vendor/autoload.php'" `
                         -replace "'\.\./\.\./uploads/", "'uploads/" `
                         -replace "'\.\./uploads/", "'uploads/"
     $content | Set-Content $file.FullName
