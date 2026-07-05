@@ -8,7 +8,7 @@ class ServiceData {
   // Use 10.0.2.2 if testing on Android Emulator to hit localhost.
   // Use your computer's local IP address (currently 10.109.82.36) if testing on a physical device.
   // LIVE SERVER URL (AWARDSPACE):
-  static const String baseUrl = 'http://192.168.100.58/govassist_backend/api';
+  static const String baseUrl = 'http://govassist.atwebpages.com/api';
   
   static String? _token;
 
