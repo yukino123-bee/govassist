@@ -5,11 +5,8 @@ import '../models/uploaded_document_model.dart';
 import 'dart:io';
 
 class ServiceData {
-  // Use 10.0.2.2 if testing on Android Emulator to hit localhost.
-  // Use your computer's local IP address (currently 10.109.82.36) if testing on a physical device.
-  // LIVE SERVER URL (AWARDSPACE):
   static const String baseUrl = 'http://govassist.atwebpages.com';
-  
+
   static String? _token;
 
   static Map<String, String> get _headers {
@@ -22,14 +19,21 @@ class ServiceData {
 
   static Future<List<ServiceCategory>> fetchCategories() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/categories.php'), headers: _headers);
+      final response = await http.get(
+        Uri.parse('$baseUrl/categories.php'),
+        headers: _headers,
+      );
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
-        return jsonResponse.map((data) => ServiceCategory(
-          id: data['id'],
-          title: data['title'],
-          iconAsset: data['iconAsset'],
-        )).toList();
+        return jsonResponse
+            .map(
+              (data) => ServiceCategory(
+                id: data['id'],
+                title: data['title'],
+                iconAsset: data['iconAsset'],
+              ),
+            )
+            .toList();
       } else {
         return [];
       }
@@ -39,7 +43,9 @@ class ServiceData {
     }
   }
 
-  static Future<List<GovernmentService>> fetchServices({String query = ''}) async {
+  static Future<List<GovernmentService>> fetchServices({
+    String query = '',
+  }) async {
     try {
       String url = '$baseUrl/services.php';
       if (query.isNotEmpty) {
@@ -58,23 +64,34 @@ class ServiceData {
             descriptionLocal: data['descriptionLocal'] ?? '',
             procedures: data['procedures'] ?? '',
             proceduresLocal: data['proceduresLocal'] ?? '',
-            requirements: (data['requirements'] as List? ?? []).map((req) => Requirement(
-              id: req['id'],
-              serviceId: req['service_id'],
-              name: req['name'],
-              nameLocal: req['nameLocal'] ?? '',
-              description: req['description'] ?? '',
-              descriptionLocal: req['descriptionLocal'] ?? '',
-              isRequired: req['is_required'] == 1 || req['is_required'] == true,
-            )).toList(),
-            eligibilityQuestions: (data['eligibilityQuestions'] as List? ?? []).map((q) => EligibilityQuestion(
-              id: q['id'],
-              serviceId: q['service_id'],
-              questionText: q['question_text'],
-              questionTextLocal: q['question_textLocal'] ?? '',
-              expectedAnswer: q['expected_answer'].toString(),
-              options: q['options'] != null ? List<String>.from(q['options']) : null,
-            )).toList(),
+            requirements: (data['requirements'] as List? ?? [])
+                .map(
+                  (req) => Requirement(
+                    id: req['id'],
+                    serviceId: req['service_id'],
+                    name: req['name'],
+                    nameLocal: req['nameLocal'] ?? '',
+                    description: req['description'] ?? '',
+                    descriptionLocal: req['descriptionLocal'] ?? '',
+                    isRequired:
+                        req['is_required'] == 1 || req['is_required'] == true,
+                  ),
+                )
+                .toList(),
+            eligibilityQuestions: (data['eligibilityQuestions'] as List? ?? [])
+                .map(
+                  (q) => EligibilityQuestion(
+                    id: q['id'],
+                    serviceId: q['service_id'],
+                    questionText: q['question_text'],
+                    questionTextLocal: q['question_textLocal'] ?? '',
+                    expectedAnswer: q['expected_answer'].toString(),
+                    options: q['options'] != null
+                        ? List<String>.from(q['options'])
+                        : null,
+                  ),
+                )
+                .toList(),
           );
         }).toList();
       } else {
@@ -86,17 +103,20 @@ class ServiceData {
     }
   }
 
-
-
   static Future<List<FaqItem>> fetchFaqs() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/faqs.php'), headers: _headers);
+      final response = await http.get(
+        Uri.parse('$baseUrl/faqs.php'),
+        headers: _headers,
+      );
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
-        return jsonResponse.map((data) => FaqItem(
-          question: data['question'],
-          answer: data['answer'],
-        )).toList();
+        return jsonResponse
+            .map(
+              (data) =>
+                  FaqItem(question: data['question'], answer: data['answer']),
+            )
+            .toList();
       }
     } catch (e) {
       print('Error fetching FAQs: $e');
@@ -106,16 +126,23 @@ class ServiceData {
 
   static Future<List<AssessmentHistory>> fetchAssessments() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/assessments.php'), headers: _headers);
+      final response = await http.get(
+        Uri.parse('$baseUrl/assessments.php'),
+        headers: _headers,
+      );
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
-        return jsonResponse.map((data) => AssessmentHistory(
-          id: data['id'],
-          serviceTitle: data['service_title'],
-          date: DateTime.parse(data['date']),
-          isEligible: data['is_eligible'] == 1,
-          referenceNumber: data['reference_number'],
-        )).toList();
+        return jsonResponse
+            .map(
+              (data) => AssessmentHistory(
+                id: data['id'],
+                serviceTitle: data['service_title'],
+                date: DateTime.parse(data['date']),
+                isEligible: data['is_eligible'] == 1,
+                referenceNumber: data['reference_number'],
+              ),
+            )
+            .toList();
       }
     } catch (e) {
       print('Error fetching assessments: $e');
@@ -123,7 +150,10 @@ class ServiceData {
     return [];
   }
 
-  static Future<bool> saveAssessment(String serviceTitle, bool isEligible) async {
+  static Future<bool> saveAssessment(
+    String serviceTitle,
+    bool isEligible,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/assessments.php'),
@@ -143,15 +173,22 @@ class ServiceData {
 
   static Future<List<InquiryTicket>> fetchInquiries() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/inquiries.php'), headers: _headers);
+      final response = await http.get(
+        Uri.parse('$baseUrl/inquiries.php'),
+        headers: _headers,
+      );
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
-        return jsonResponse.map((data) => InquiryTicket(
-          id: data['id'],
-          subject: data['subject'],
-          status: data['status'],
-          dateSubmitted: DateTime.parse(data['date_submitted']),
-        )).toList();
+        return jsonResponse
+            .map(
+              (data) => InquiryTicket(
+                id: data['id'],
+                subject: data['subject'],
+                status: data['status'],
+                dateSubmitted: DateTime.parse(data['date_submitted']),
+              ),
+            )
+            .toList();
       }
     } catch (e) {
       print('Error fetching inquiries: $e');
@@ -159,7 +196,11 @@ class ServiceData {
     return [];
   }
 
-  static Future<bool> createInquiry(String subject, String category, String description) async {
+  static Future<bool> createInquiry(
+    String subject,
+    String category,
+    String description,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/inquiries.php'),
@@ -180,15 +221,22 @@ class ServiceData {
 
   static Future<List<InquiryMessage>> fetchMessages(String ticketId) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/messages.php?ticket_id=$ticketId'), headers: _headers);
+      final response = await http.get(
+        Uri.parse('$baseUrl/messages.php?ticket_id=$ticketId'),
+        headers: _headers,
+      );
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
-        return jsonResponse.map((data) => InquiryMessage(
-          id: data['id'],
-          text: data['message_text'],
-          isUser: data['is_user'] == 1,
-          timestamp: DateTime.parse(data['timestamp']),
-        )).toList();
+        return jsonResponse
+            .map(
+              (data) => InquiryMessage(
+                id: data['id'],
+                text: data['message_text'],
+                isUser: data['is_user'] == 1,
+                timestamp: DateTime.parse(data['timestamp']),
+              ),
+            )
+            .toList();
       }
     } catch (e) {
       print('Error fetching messages: $e');
@@ -217,12 +265,19 @@ class ServiceData {
 
   // DOCUMENT UPLOADS
 
-  static Future<List<UploadedDocument>> fetchUploadedDocuments(String userId) async {
+  static Future<List<UploadedDocument>> fetchUploadedDocuments(
+    String userId,
+  ) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/get_documents.php?user_id=$userId'), headers: _headers);
+      final response = await http.get(
+        Uri.parse('$baseUrl/get_documents.php?user_id=$userId'),
+        headers: _headers,
+      );
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
-        return jsonResponse.map((data) => UploadedDocument.fromJson(data)).toList();
+        return jsonResponse
+            .map((data) => UploadedDocument.fromJson(data))
+            .toList();
       }
     } catch (e) {
       print('Error fetching documents: $e');
@@ -232,10 +287,14 @@ class ServiceData {
 
   static Future<List<UploadedDocument>> fetchAllDocuments() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/admin_get_documents.php'));
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin_get_documents.php'),
+      );
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
-        return jsonResponse.map((data) => UploadedDocument.fromJson(data)).toList();
+        return jsonResponse
+            .map((data) => UploadedDocument.fromJson(data))
+            .toList();
       }
     } catch (e) {
       print('Error fetching all documents: $e');
@@ -243,18 +302,28 @@ class ServiceData {
     return [];
   }
 
-  static Future<Map<String, dynamic>> uploadDocument(String userId, String serviceId, String requirementName, File document) async {
+  static Future<Map<String, dynamic>> uploadDocument(
+    String userId,
+    String serviceId,
+    String requirementName,
+    File document,
+  ) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/upload.php'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/upload.php'),
+      );
       if (_token != null) {
         request.headers['Authorization'] = 'Bearer $_token';
       }
       request.fields['user_id'] = userId;
       request.fields['service_id'] = serviceId;
       request.fields['requirement_name'] = requirementName;
-      
-      request.files.add(await http.MultipartFile.fromPath('document', document.path));
-      
+
+      request.files.add(
+        await http.MultipartFile.fromPath('document', document.path),
+      );
+
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
       return json.decode(responseData);
@@ -265,17 +334,19 @@ class ServiceData {
 
   // AUTHENTICATION
 
-  static Future<Map<String, dynamic>> login(String email, String password) async {
+  static Future<Map<String, dynamic>> login(
+    String email,
+    String password,
+  ) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/login.php'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'email': email,
-          'password': password,
-        }),
-      ).timeout(const Duration(seconds: 10));
-      
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/login.php'),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode({'email': email, 'password': password}),
+          )
+          .timeout(const Duration(seconds: 10));
+
       final data = json.decode(response.body);
       if (response.statusCode == 200 && data['success'] == true) {
         if (data['token'] != null) {
@@ -284,7 +355,7 @@ class ServiceData {
         return {'success': true, 'user': data['user']};
       } else {
         return {
-          'success': false, 
+          'success': false,
           'error': data['error'] ?? 'Login failed',
           'unverified': data['unverified'] ?? false,
         };
@@ -301,21 +372,26 @@ class ServiceData {
     required String password,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/register.php'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'fullName': fullName,
-          'email': email,
-          'password': password,
-        }),
-      ).timeout(const Duration(seconds: 10));
-      
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/register.php'),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode({
+              'fullName': fullName,
+              'email': email,
+              'password': password,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
       final data = json.decode(response.body);
       if (response.statusCode == 200 && data['success'] == true) {
         return {'success': true, 'mock_email_otp': data['mock_email_otp']};
       } else {
-        return {'success': false, 'error': data['error'] ?? 'Registration failed'};
+        return {
+          'success': false,
+          'error': data['error'] ?? 'Registration failed',
+        };
       }
     } catch (e) {
       print('Error during registration: $e');
@@ -323,7 +399,10 @@ class ServiceData {
     }
   }
 
-  static Future<Map<String, dynamic>> verifyEmail(String email, String code) async {
+  static Future<Map<String, dynamic>> verifyEmail(
+    String email,
+    String code,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/verify_email.php'),
@@ -331,7 +410,10 @@ class ServiceData {
         body: json.encode({'email': email, 'code': code}),
       );
       final data = json.decode(response.body);
-      return {'success': response.statusCode == 200, 'message': data['message'] ?? data['error']};
+      return {
+        'success': response.statusCode == 200,
+        'message': data['message'] ?? data['error'],
+      };
     } catch (e) {
       return {'success': false, 'message': 'Network error'};
     }
@@ -345,7 +427,11 @@ class ServiceData {
         body: json.encode({'email': email}),
       );
       final data = json.decode(response.body);
-      return {'success': response.statusCode == 200, 'mock_email_otp': data['mock_email_otp'], 'message': data['message'] ?? data['error']};
+      return {
+        'success': response.statusCode == 200,
+        'mock_email_otp': data['mock_email_otp'],
+        'message': data['message'] ?? data['error'],
+      };
     } catch (e) {
       return {'success': false, 'message': 'Network error'};
     }
@@ -360,19 +446,23 @@ class ServiceData {
     String? address,
     String? civilStatus,
     String? contactNumber,
-    dynamic idImage, // Can be File or XFile depending on platform, usually dart:io File
+    dynamic
+    idImage, // Can be File or XFile depending on platform, usually dart:io File
     dynamic profilePicture,
   }) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/profile.php'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/profile.php'),
+      );
       if (_token != null) {
         request.headers['Authorization'] = 'Bearer $_token';
       }
-      
+
       request.fields['user_id'] = userId;
       request.fields['full_name'] = fullName;
       request.fields['email'] = email;
-      
+
       if (password != null && password.isNotEmpty) {
         request.fields['password'] = password;
       }
@@ -390,21 +480,33 @@ class ServiceData {
       }
 
       if (idImage != null) {
-        request.files.add(await http.MultipartFile.fromPath('valid_id', idImage.path));
-      }
-      
-      if (profilePicture != null) {
-        request.files.add(await http.MultipartFile.fromPath('profile_picture', profilePicture.path));
+        request.files.add(
+          await http.MultipartFile.fromPath('valid_id', idImage.path),
+        );
       }
 
-      final streamedResponse = await request.send().timeout(const Duration(seconds: 15));
+      if (profilePicture != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'profile_picture',
+            profilePicture.path,
+          ),
+        );
+      }
+
+      final streamedResponse = await request.send().timeout(
+        const Duration(seconds: 15),
+      );
       final response = await http.Response.fromStream(streamedResponse);
-      
+
       final data = json.decode(response.body);
       if (response.statusCode == 200 && data['success'] == true) {
         return {'success': true, 'user': data['user']};
       } else {
-        return {'success': false, 'error': data['error'] ?? 'Profile update failed'};
+        return {
+          'success': false,
+          'error': data['error'] ?? 'Profile update failed',
+        };
       }
     } catch (e) {
       print('Error during profile update: $e');
@@ -414,7 +516,10 @@ class ServiceData {
 
   static Future<Map<String, dynamic>> fetchNotifications(String userId) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/notifications.php?user_id=$userId'), headers: _headers);
+      final response = await http.get(
+        Uri.parse('$baseUrl/notifications.php?user_id=$userId'),
+        headers: _headers,
+      );
       if (response.statusCode == 200) {
         return json.decode(response.body);
       }
@@ -424,7 +529,10 @@ class ServiceData {
     }
   }
 
-  static Future<bool> markNotificationRead(String userId, {String? notificationId}) async {
+  static Future<bool> markNotificationRead(
+    String userId, {
+    String? notificationId,
+  }) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/notifications.php'),
@@ -443,7 +551,10 @@ class ServiceData {
 
   static Future<Map<String, dynamic>> getProfile(String userId) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/profile.php?user_id=$userId'), headers: _headers);
+      final response = await http.get(
+        Uri.parse('$baseUrl/profile.php?user_id=$userId'),
+        headers: _headers,
+      );
       if (response.statusCode == 200) {
         return json.decode(response.body);
       }
@@ -453,7 +564,10 @@ class ServiceData {
     }
   }
 
-  static Future<Map<String, dynamic>> submitApplication(String userId, String serviceId) async {
+  static Future<Map<String, dynamic>> submitApplication(
+    String userId,
+    String serviceId,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/applications.php'),
@@ -468,7 +582,10 @@ class ServiceData {
 
   static Future<Map<String, dynamic>> fetchApplications(String userId) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/applications.php?user_id=$userId'), headers: _headers);
+      final response = await http.get(
+        Uri.parse('$baseUrl/applications.php?user_id=$userId'),
+        headers: _headers,
+      );
       if (response.statusCode == 200) {
         return json.decode(response.body);
       }
@@ -481,12 +598,14 @@ class ServiceData {
   // GOVBOT API
   static Future<String> sendGovBotQuery(String message) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/govbot.php'),
-        headers: _headers,
-        body: json.encode({'message': message}),
-      ).timeout(const Duration(seconds: 10));
-      
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/govbot.php'),
+            headers: _headers,
+            body: json.encode({'message': message}),
+          )
+          .timeout(const Duration(seconds: 10));
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         return data['response'] ?? 'Sorry, I could not process your request.';
