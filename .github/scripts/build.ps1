@@ -41,7 +41,9 @@ foreach ($file in $phpFiles) {
     $content = $content -replace "'\.\./cors\.php'", "'cors.php'" `
                         -replace "'\.\./db\.php'", "'db.php'" `
                         -replace "'\.\./auth_middleware\.php'", "'auth_middleware.php'" `
-                        -replace "'\.\./jwt\.php'", "'jwt.php'"
+                        -replace "'\.\./jwt\.php'", "'jwt.php'" `
+                        -replace "'\.\./\.\./uploads/", "'uploads/" `
+                        -replace "'\.\./uploads/", "'uploads/"
     $content | Set-Content $file.FullName
 }
 
