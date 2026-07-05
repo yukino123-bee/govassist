@@ -3,6 +3,7 @@
 
 require_once 'cors.php';
 require_once 'db.php';
+require_once 'mailer.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -22,17 +23,27 @@ if ($method === 'POST') {
 
             // Hash the password securely
             $passwordHash = password_hash($input['password'], PASSWORD_DEFAULT);
+            $verificationCode = sprintf("%06d", mt_rand(1, 999999));
             
-            $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password_hash, created_at) VALUES (?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password_hash, created_at, verification_code) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([
                 $input['fullName'],
                 $input['email'],
                 $passwordHash,
-                date('Y-m-d H:i:s')
+                date('Y-m-d H:i:s'),
+                $verificationCode
             ]);
             
+            // Send actual email
+            $emailSent = sendVerificationEmail($input['email'], $verificationCode);
+            
             http_response_code(200);
-            echo json_encode(['success' => true]);
+            echo json_encode([
+                'success' => true,
+                'message' => 'Registration successful. Please check your email for the OTP.',
+                'email_sent' => $emailSent,
+                'mock_email_otp' => $verificationCode // For testing purposes since we don't have SMTP
+            ]);
         } catch (PDOException $e) {
             http_response_code(500);
             echo json_encode(['error' => $e->getMessage()]);

@@ -75,26 +75,42 @@ CREATE TABLE IF NOT EXISTS users (
     full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    is_admin BOOLEAN DEFAULT FALSE,
-    created_at DATETIME NOT NULL
+    created_at DATETIME NOT NULL,
+    email_verified_at DATETIME DEFAULT NULL,
+    verification_code VARCHAR(10) DEFAULT NULL,
+    dob DATE DEFAULT NULL,
+    address TEXT DEFAULT NULL,
+    civil_status VARCHAR(50) DEFAULT NULL,
+    contact_number VARCHAR(50) DEFAULT NULL,
+    valid_id_path VARCHAR(255) DEFAULT NULL
 );
 
-CREATE TABLE IF NOT EXISTS documents (
+CREATE TABLE IF NOT EXISTS notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS applications (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     service_id VARCHAR(50) NOT NULL,
-    requirement_name VARCHAR(255) NOT NULL,
-    file_path TEXT NOT NULL,
-    status VARCHAR(50) DEFAULT 'Pending',
-    uploaded_at DATETIME NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    submitted_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
 );
 
 -- Mock Data Insertion
 
-INSERT INTO users (full_name, email, password_hash, is_admin, created_at) VALUES 
-('Admin User', 'admin@ssfo.gov.ph', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', TRUE, NOW()); -- Password is 'password'
+INSERT INTO users (full_name, email, password_hash, created_at) VALUES 
+('Admin User', 'admin@ssfo.gov.ph', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NOW()); -- Password is 'password'
 
 INSERT INTO categories (id, title, iconAsset) VALUES 
 ('cat_1', 'Civil Registry', 'assets/icons/civil.png'),

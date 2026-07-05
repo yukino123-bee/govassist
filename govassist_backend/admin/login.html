@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - GovAssist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- tsParticles -->
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+    <style>
+        body {
+            background: #f8fafc; /* Very clean light grayish blue background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            position: relative;
+        }
+
+        #tsparticles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            background: #ffffff; /* Crisp, solid white */
+            border: 1px solid #e2e8f0; /* Clear, visible border */
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-container img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+        }
+
+        .login-card h2 {
+            margin-bottom: 2.5rem;
+            color: #0f172a; /* Slate 900 for a very crisp, modern dark color */
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #475569; /* Slate 600 */
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            color: #1e293b;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #B91C1C;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8;
+        }
+
+        .btn-primary {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 0.875rem 1rem;
+            background: #B91C1C;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: #991B1B;
+            box-shadow: 0 4px 6px -1px rgba(185, 28, 28, 0.2), 0 2px 4px -1px rgba(185, 28, 28, 0.1);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+
+        #loginError {
+            color: #dc2626;
+            margin-top: 1.25rem;
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: #fef2f2;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="tsparticles"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo-container">
+                <img src="images/logo.png" alt="SSFO Logo">
+            </div>
+            <h2>GovAssist Admin</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" required placeholder="admin@ssfo.gov.ph">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-primary">Login to Dashboard</button>
+                <div id="loginError"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // tsParticles configuration for red connecting dots
+        tsParticles.load("tsparticles", {
+            background: {
+                color: {
+                    value: "transparent",
+                },
+            },
+            fpsLimit: 60,
+            interactivity: {
+                events: {
+                    onHover: {
+                        enable: true,
+                        mode: "grab", // Attract lines to mouse cursor
+                    },
+                    onClick: {
+                        enable: true,
+                        mode: "push",
+                    },
+                },
+                modes: {
+                    grab: {
+                        distance: 200,
+                        links: {
+                            opacity: 0.5,
+                        },
+                    },
+                    push: {
+                        quantity: 4,
+                    },
+                },
+            },
+            particles: {
+                color: {
+                    value: "#B91C1C", // Red dots
+                },
+                links: {
+                    color: "#EF4444", // Red links
+                    distance: 150,
+                    enable: true,
+                    opacity: 0.3,
+                    width: 1,
+                },
+                move: {
+                    direction: "none",
+                    enable: true,
+                    outModes: {
+                        default: "bounce",
+                    },
+                    random: false,
+                    speed: 1.5,
+                    straight: false,
+                },
+                number: {
+                    density: {
+                        enable: true,
+                        area: 800,
+                    },
+                    value: 80,
+                },
+                opacity: {
+                    value: 0.6,
+                },
+                shape: {
+                    type: "circle",
+                },
+                size: {
+                    value: { min: 1, max: 4 },
+                },
+            },
+            detectRetina: true,
+        });
+
+        // Login Auth
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+            const submitBtn = document.querySelector('.btn-primary');
+
+            // Loading state
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Authenticating...';
+            submitBtn.style.opacity = '0.8';
+            submitBtn.disabled = true;
+
+            try {
+                // Pointing to our actual user DB
+                const res = await fetch('../api/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                
+                if (data.success && data.user.is_admin == 1) {
+                    // Save user session
+                    sessionStorage.setItem('govassist_admin', JSON.stringify(data.user));
+                    if (data.token) sessionStorage.setItem('govassist_token', data.token);
+                    
+                    // Success animation before redirect
+                    submitBtn.textContent = 'Success!';
+                    submitBtn.style.background = '#10B981';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 500);
+                } else if (data.success && data.user.is_admin != 1) {
+                    errorDiv.textContent = 'Access denied. Administrator privileges required.';
+                    errorDiv.style.display = 'block';
+                    resetBtn();
+                } else {
+                    errorDiv.textContent = data.error || 'Invalid credentials';
+                    errorDiv.style.display = 'block';
+                    resetBtn();
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Connection error. Check backend server.';
+                errorDiv.style.display = 'block';
+                resetBtn();
+            }
+
+            function resetBtn() {
+                submitBtn.textContent = originalText;
+                submitBtn.style.opacity = '1';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -5,8 +5,17 @@ require_once 'cors.php';
 require_once 'db.php';
 
 try {
-    // Fetch all services
-    $stmt = $pdo->query("SELECT * FROM services");
+    // Fetch all services with optional search
+    $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+    
+    if ($search !== '') {
+        $stmt = $pdo->prepare("SELECT * FROM services WHERE title LIKE ? OR description LIKE ? OR titleLocal LIKE ?");
+        $searchTerm = "%{$search}%";
+        $stmt->execute([$searchTerm, $searchTerm, $searchTerm]);
+    } else {
+        $stmt = $pdo->query("SELECT * FROM services");
+    }
+    
     $services = $stmt->fetchAll();
 
     // Fetch requirements for each service
@@ -30,8 +39,7 @@ try {
         $questions = $eqStmt->fetchAll();
         
         foreach ($questions as &$q) {
-            $q['expected_answer'] = (bool)$q['expected_answer'];
-            if ($q['options']) {
+            if (isset($q['options']) && !empty($q['options'])) {
                 $q['options'] = json_decode($q['options'], true);
             }
         }

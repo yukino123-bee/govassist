@@ -30,11 +30,12 @@ if ($method === 'GET') {
             // Generate a random reference number
             $refNumber = 'REF-' . strtoupper(substr(md5(uniqid()), 0, 8));
             $isEligible = $input['isEligible'] ? 1 : 0;
+            $formattedDate = date('Y-m-d H:i:s', strtotime($input['date']));
             
             $stmt->execute([
                 $input['serviceTitle'],
                 $isEligible,
-                $input['date'],
+                $formattedDate,
                 $refNumber
             ]);
             

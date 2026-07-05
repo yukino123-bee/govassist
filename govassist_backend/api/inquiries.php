@@ -43,26 +43,6 @@ if ($method === 'GET') {
                 $input['dateSubmitted']
             ]);
             
-            // AI Integration: Call Python script
-            $subjectEscaped = escapeshellarg($input['subject']);
-            $descEscaped = escapeshellarg($input['description']);
-            // Use python3 if available, else python
-            $pythonCmd = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? 'python' : 'python3';
-            $pythonOutput = shell_exec("$pythonCmd analyze_inquiry.py $subjectEscaped $descEscaped");
-            
-            if ($pythonOutput) {
-                $aiData = json_decode($pythonOutput, true);
-                if (isset($aiData['ai_response'])) {
-                    $aiMsgStmt = $pdo->prepare("INSERT INTO messages (ticket_id, message_text, is_user, timestamp) VALUES (?, ?, ?, ?)");
-                    $aiMsgStmt->execute([
-                        $ticketId,
-                        $aiData['ai_response'],
-                        0, // is_user = false (AI/Admin)
-                        date('Y-m-d H:i:s', strtotime($input['dateSubmitted']) + 1) // Add 1 second
-                    ]);
-                }
-            }
-            
             $pdo->commit();
             
             http_response_code(200);
