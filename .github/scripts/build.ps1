@@ -15,6 +15,15 @@ Copy-Item -Path "$source/admin/css/*.*" -Destination $flatDest -Force -ErrorActi
 Copy-Item -Path "$source/admin/js/*.*" -Destination $flatDest -Force -ErrorAction SilentlyContinue
 Copy-Item -Path "$source/admin/images/*.*" -Destination $flatDest -Force -ErrorAction SilentlyContinue
 
+# Ensure upload directories exist
+New-Item -ItemType Directory -Path "$flatDest/uploads/profiles" -Force -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Path "$flatDest/uploads/ids" -Force -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Path "$flatDest/uploads/templates" -Force -ErrorAction SilentlyContinue
+" " | Set-Content "$flatDest/uploads/index.html"
+" " | Set-Content "$flatDest/uploads/profiles/index.html"
+" " | Set-Content "$flatDest/uploads/ids/index.html"
+" " | Set-Content "$flatDest/uploads/templates/index.html"
+
 # Create .htaccess to preserve Authorization header on Awardspace
 $htaccessContent = @"
 RewriteEngine On
