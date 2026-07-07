@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/user_session.dart';
 import '../../data/service_data.dart';
+import '../../core/translations.dart';
 
 class ApplicationTrackingScreen extends StatefulWidget {
   const ApplicationTrackingScreen({super.key});
@@ -45,12 +46,12 @@ class _ApplicationTrackingScreenState extends State<ApplicationTrackingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Applications'),
+        title: Text('My Applications'.tr()),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _applications.isEmpty
-              ? const Center(child: Text('You have not submitted any applications yet.'))
+              ? Center(child: Text('You have not submitted any applications yet.'.tr()))
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: _applications.length,
@@ -72,7 +73,7 @@ class _ApplicationTrackingScreenState extends State<ApplicationTrackingScreen> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    app['service_title'] ?? 'Service Application',
+                                    app['service_title'] ?? 'Service Application'.tr(),
                                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                   ),
                                 ),
@@ -90,10 +91,10 @@ class _ApplicationTrackingScreenState extends State<ApplicationTrackingScreen> {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            Text('Submitted on: ${app['submitted_at']}'),
+                            Text('Submitted on: '.tr() + '${app['submitted_at']}'),
                             if (app['updated_at'] != null && app['updated_at'] != app['submitted_at']) ...[
                               const SizedBox(height: 4),
-                              Text('Last updated: ${app['updated_at']}'),
+                              Text('Last updated: '.tr() + '${app['updated_at']}'),
                             ]
                           ],
                         ),

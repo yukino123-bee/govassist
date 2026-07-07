@@ -4,6 +4,7 @@ import '../../models/service_model.dart';
 import '../../widgets/custom_widgets.dart';
 import 'package:intl/intl.dart';
 import 'eligibility_questions_screen.dart';
+import '../../core/translations.dart';
 
 class EligibilityHomeScreen extends StatefulWidget {
   const EligibilityHomeScreen({super.key});
@@ -39,7 +40,7 @@ class _EligibilityHomeScreenState extends State<EligibilityHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Eligibility Assessment'),
+        title: Text('Eligibility Assessment'.tr()),
         automaticallyImplyLeading: false,
       ),
       body: _isLoading 
@@ -62,16 +63,16 @@ class _EligibilityHomeScreenState extends State<EligibilityHomeScreen> {
                 children: [
                   Icon(Icons.assignment_turned_in, size: 40, color: Theme.of(context).primaryColor),
                   const SizedBox(width: 16),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Check your eligibility for government services before applying.',
+                      'Check your eligibility for government services before applying.'.tr(),
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-            const SectionHeader(title: 'Assess Services'),
+            SectionHeader(title: 'Assess Services'.tr()),
             const SizedBox(height: 16),
             ..._services.map((service) {
               return Card(
@@ -91,9 +92,9 @@ class _EligibilityHomeScreenState extends State<EligibilityHomeScreen> {
               );
             }),
             const SizedBox(height: 32),
-            const SectionHeader(title: 'Assessment History'),
+            SectionHeader(title: 'Assessment History'.tr()),
             const SizedBox(height: 16),
-            _history.isEmpty ? const Text("No assessment history.") : Column(
+            _history.isEmpty ? Text('No assessment history.'.tr()) : Column(
               children: _history.map((history) {
                 bool isEligible = history.isEligible;
                 DateTime date = history.date;
@@ -122,7 +123,7 @@ class _EligibilityHomeScreenState extends State<EligibilityHomeScreen> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              'Ref: ${history.referenceNumber}',
+                              'Ref: '.tr() + history.referenceNumber,
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -134,7 +135,7 @@ class _EligibilityHomeScreenState extends State<EligibilityHomeScreen> {
                       ],
                     ),
                     trailing: Text(
-                      isEligible ? 'Eligible' : 'Not Eligible',
+                      isEligible ? 'Eligible'.tr() : 'Not Eligible'.tr(),
                       style: TextStyle(
                         color: isEligible ? Colors.green : Colors.red,
                         fontWeight: FontWeight.bold,

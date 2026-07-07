@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/translations.dart';
 import 'home/home_screen.dart';
 import 'eligibility/eligibility_home_screen.dart';
 import 'inquiry/inquiry_home_screen.dart';
@@ -44,26 +45,26 @@ class _MainLayoutState extends State<MainLayout> {
             _currentIndex = index;
           });
         },
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
+            icon: const Icon(Icons.home_outlined),
+            activeIcon: const Icon(Icons.home),
+            label: 'Home'.tr(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.assignment_outlined),
-            activeIcon: Icon(Icons.assignment),
-            label: 'Eligibility',
+            icon: const Icon(Icons.assignment_outlined),
+            activeIcon: const Icon(Icons.assignment),
+            label: 'Eligibility'.tr(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.help_outline),
-            activeIcon: Icon(Icons.help),
-            label: 'Inquiry',
+            icon: const Icon(Icons.help_outline),
+            activeIcon: const Icon(Icons.help),
+            label: 'Inquiry'.tr(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
+            icon: const Icon(Icons.person_outline),
+            activeIcon: const Icon(Icons.person),
+            label: 'Profile'.tr(),
           ),
         ],
       ),

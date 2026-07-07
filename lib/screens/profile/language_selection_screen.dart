@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/translations.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({super.key});
@@ -11,11 +12,11 @@ class LanguageSelectionScreen extends StatefulWidget {
 class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   String _selectedLanguage = 'English';
 
-  final List<String> _languages = [
-    'English',
-    'Filipino',
-    'Cebuano',
-  ];
+  final Map<String, String> _languages = {
+    'en': 'English',
+    'tl': 'Filipino',
+    'ceb': 'Cebuano',
+  };
 
   @override
   void initState() {
@@ -26,28 +27,28 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   Future<void> _loadLanguage() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _selectedLanguage = prefs.getString('app_language') ?? 'English';
+      _selectedLanguage = prefs.getString('language') ?? 'en';
     });
   }
 
-  Future<void> _saveLanguage(String language) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('app_language', language);
+  Future<void> _saveLanguage(String languageCode) async {
+    await AppTranslations.setLanguage(languageCode);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Language Selection'),
+        title: Text('Language'.tr()),
       ),
       body: ListView.builder(
         itemCount: _languages.length,
         itemBuilder: (context, index) {
-          final lang = _languages[index];
+          final langCode = _languages.keys.elementAt(index);
+          final langName = _languages[langCode]!;
           return RadioListTile<String>(
-            title: Text(lang),
-            value: lang,
+            title: Text(langName.tr()),
+            value: langCode,
             groupValue: _selectedLanguage,
             onChanged: (value) {
               setState(() {
@@ -55,7 +56,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               });
               _saveLanguage(value!);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Language changed to $lang')),
+                SnackBar(content: Text('Language'.tr() + ' -> ' + langName.tr())),
               );
             },
           );

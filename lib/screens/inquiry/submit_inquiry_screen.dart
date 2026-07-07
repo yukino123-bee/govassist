@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/custom_widgets.dart';
 import '../../core/theme.dart';
 import '../../data/service_data.dart';
+import '../../core/translations.dart';
 
 class SubmitInquiryScreen extends StatefulWidget {
   const SubmitInquiryScreen({super.key});
@@ -17,12 +18,12 @@ class _SubmitInquiryScreenState extends State<SubmitInquiryScreen> {
   bool _isLoading = false;
 
   final List<String> _categories = [
-    'Educational Assistance',
-    'Burial Assistance',
-    'Medical Assistance',
-    'Employment Assistance',
-    'Transportation Assistance',
-    'Other'
+    'Educational Assistance'.tr(),
+    'Burial Assistance'.tr(),
+    'Medical Assistance'.tr(),
+    'Employment Assistance'.tr(),
+    'Transportation Assistance'.tr(),
+    'Other'.tr()
   ];
 
   @override
@@ -38,7 +39,7 @@ class _SubmitInquiryScreenState extends State<SubmitInquiryScreen> {
 
     if (_selectedCategory == null || subject.isEmpty || description.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields and select a category')),
+        SnackBar(content: Text('Please fill all fields and select a category'.tr())),
       );
       return;
     }
@@ -57,13 +58,13 @@ class _SubmitInquiryScreenState extends State<SubmitInquiryScreen> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Inquiry submitted successfully!')),
+          SnackBar(content: Text('Inquiry submitted successfully!'.tr())),
         );
       }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to submit inquiry. Please try again.')),
+          SnackBar(content: Text('Failed to submit inquiry. Please try again.'.tr())),
         );
       }
     }
@@ -73,7 +74,7 @@ class _SubmitInquiryScreenState extends State<SubmitInquiryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Submit Inquiry'),
+        title: Text('Submit Inquiry'.tr()),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -81,24 +82,24 @@ class _SubmitInquiryScreenState extends State<SubmitInquiryScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'How can we help?',
+              'How can we help?'.tr(),
               style: Theme.of(context).textTheme.displayMedium,
             ),
             const SizedBox(height: 8),
             Text(
-              'Please provide details about your issue or question.',
+              'Please provide details about your issue or question.'.tr(),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 32),
             CustomTextField(
               controller: _subjectController,
-              label: 'Subject',
-              hint: 'Brief summary of your inquiry',
+              label: 'Subject'.tr(),
+              hint: 'Brief summary of your inquiry'.tr(),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Category',
-              style: TextStyle(
+            Text(
+              'Category'.tr(),
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.textPrimary,
@@ -107,7 +108,7 @@ class _SubmitInquiryScreenState extends State<SubmitInquiryScreen> {
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
               value: _selectedCategory,
-              hint: const Text('Select a program or category'),
+              hint: Text('Select a program or category'.tr()),
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -139,15 +140,15 @@ class _SubmitInquiryScreenState extends State<SubmitInquiryScreen> {
             const SizedBox(height: 16),
             CustomTextField(
               controller: _descController,
-              label: 'Description',
-              hint: 'Provide as much detail as possible',
+              label: 'Description'.tr(),
+              hint: 'Provide as much detail as possible'.tr(),
               maxLines: 5,
             ),
             const SizedBox(height: 32),
             _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : CustomButton(
-                    text: 'Submit Inquiry',
+                    text: 'Submit Inquiry'.tr(),
                     onPressed: _submit,
                   ),
           ],

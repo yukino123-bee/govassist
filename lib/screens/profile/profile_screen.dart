@@ -7,6 +7,7 @@ import 'legal_screens.dart';
 import '../../core/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/service_data.dart';
+import '../../core/translations.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -16,7 +17,7 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text('Profile & Settings'),
+        title: Text('Profile & Settings'.tr()),
         automaticallyImplyLeading: false,
         elevation: 0,
       ),
@@ -30,48 +31,48 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle(context, 'Account Settings'),
+                  _buildSectionTitle(context, 'Account Settings'.tr()),
                   _buildCardGroup([
                     _buildProfileMenu(
                       context,
-                      'Edit Profile',
-                      'Update your personal details',
+                      'Edit Profile'.tr(),
+                      'Update your personal details'.tr(),
                       Icons.person_outline,
                       Theme.of(context).primaryColor,
                       () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen())),
                     ),
                     _buildProfileMenu(
                       context,
-                      'Language',
-                      'Change app display language',
+                      'Language'.tr(),
+                      'Change app display language'.tr(),
                       Icons.language,
                       Colors.orange,
                       () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LanguageSelectionScreen())),
                     ),
                     _buildProfileMenu(
                       context,
-                      'App Settings',
-                      'Notifications & display options',
+                      'App Settings'.tr(),
+                      'Notifications & display options'.tr(),
                       Icons.settings_outlined,
                       Colors.purple,
                       () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AppSettingsScreen())),
                     ),
                   ]),
                   const SizedBox(height: 24),
-                  _buildSectionTitle(context, 'Legal'),
+                  _buildSectionTitle(context, 'Legal'.tr()),
                   _buildCardGroup([
                     _buildProfileMenu(
                       context,
-                      'Terms & Conditions',
-                      'Read our terms of service',
+                      'Terms & Conditions'.tr(),
+                      'Read our terms of service'.tr(),
                       Icons.description_outlined,
                       Colors.grey.shade700,
                       () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TermsConditionsScreen())),
                     ),
                     _buildProfileMenu(
                       context,
-                      'Privacy Policy',
-                      'Data usage and protection',
+                      'Privacy Policy'.tr(),
+                      'Data usage and protection'.tr(),
                       Icons.privacy_tip_outlined,
                       Colors.grey.shade700,
                       () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen())),
@@ -83,9 +84,9 @@ class ProfileScreen extends StatelessWidget {
                     child: OutlinedButton.icon(
                       onPressed: () => _showLogoutDialog(context),
                       icon: const Icon(Icons.logout, color: Colors.redAccent),
-                      label: const Text(
-                        'Log Out',
-                        style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16),
+                      label: Text(
+                        'Log Out'.tr(),
+                        style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: Colors.redAccent.withOpacity(0.5), width: 1.5),
@@ -241,9 +242,9 @@ class ProfileScreen extends StatelessWidget {
                 child: const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 36),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Log Out?',
-                style: TextStyle(
+              Text(
+                'Log Out?'.tr(),
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
@@ -251,7 +252,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Are you sure you want to log out of your account? You will need to enter your credentials to log back in.',
+                'Are you sure you want to log out of your account? You will need to enter your credentials to log back in.'.tr(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
@@ -270,7 +271,7 @@ class ProfileScreen extends StatelessWidget {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         side: BorderSide(color: Colors.grey.shade300),
                       ),
-                      child: Text('Cancel', style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.bold)),
+                      child: Text('Cancel'.tr(), style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.bold)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -299,7 +300,7 @@ class ProfileScreen extends StatelessWidget {
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text('Log Out', style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: Text('Log Out'.tr(), style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],

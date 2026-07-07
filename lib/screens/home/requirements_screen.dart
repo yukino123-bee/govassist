@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../models/service_model.dart';
 import '../../widgets/custom_widgets.dart';
+import '../../core/translations.dart';
 
 class RequirementsScreen extends StatefulWidget {
   final GovernmentService service;
@@ -54,7 +55,7 @@ class _RequirementsScreenState extends State<RequirementsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Requirements Checklist'),
+        title: Text('Requirements Checklist'.tr()),
       ),
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator())
@@ -64,7 +65,7 @@ class _RequirementsScreenState extends State<RequirementsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Prepare these documents for:',
+              'Prepare these documents for:'.tr(),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 8),
@@ -78,7 +79,7 @@ class _RequirementsScreenState extends State<RequirementsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Completion Progress',
+                  'Completion Progress'.tr(),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
@@ -101,7 +102,7 @@ class _RequirementsScreenState extends State<RequirementsScreen> {
             const SizedBox(height: 32),
             Expanded(
               child: _requirements.isEmpty 
-              ? const Text('No requirements needed for this service.')
+              ? Text('No requirements needed for this service.'.tr())
               : ListView.builder(
                 itemCount: _requirements.length,
                 itemBuilder: (context, index) {
@@ -116,8 +117,8 @@ class _RequirementsScreenState extends State<RequirementsScreen> {
                         _checklistStatus[req.id] = true;
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Document successfully scanned and verified!'),
+                        SnackBar(
+                          content: Text('Document successfully scanned and verified!'.tr()),
                           backgroundColor: Colors.green,
                           duration: Duration(seconds: 2),
                         ),
@@ -134,17 +135,17 @@ class _RequirementsScreenState extends State<RequirementsScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: CustomButton(
-            text: 'I have scanned all documents',
+            text: 'I have scanned all documents'.tr(),
             onPressed: _allChecked
                 ? () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('All requirements verified! You can now apply.')),
+                      SnackBar(content: Text('All requirements verified! You can now apply.'.tr())),
                     );
                     Navigator.pop(context);
                   }
                 : () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please scan and verify all documents first.')),
+                      SnackBar(content: Text('Please scan and verify all documents first.'.tr())),
                     );
                   },
           ),
@@ -214,7 +215,7 @@ class _ScannerItemCardState extends State<ScannerItemCard> with SingleTickerProv
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to open camera: $e')),
+          SnackBar(content: Text('Failed to open camera: '.tr() + e.toString())),
         );
       }
     }
@@ -346,7 +347,7 @@ class _ScannerItemCardState extends State<ScannerItemCard> with SingleTickerProv
                       ElevatedButton.icon(
                         onPressed: _startScan,
                         icon: const Icon(Icons.camera_alt),
-                        label: const Text('Take Photo'),
+                        label: Text('Take Photo'.tr()),
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 48),
                         ),
@@ -355,7 +356,7 @@ class _ScannerItemCardState extends State<ScannerItemCard> with SingleTickerProv
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         child: Text(
-                          'Verifying document...',
+                          'Verifying document...'.tr(),
                           style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
                         ),
                       ),

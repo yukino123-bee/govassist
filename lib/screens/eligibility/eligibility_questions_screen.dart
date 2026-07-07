@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/service_model.dart';
 import 'assessment_result_screen.dart';
+import '../../core/translations.dart';
 
 class EligibilityQuestionsScreen extends StatefulWidget {
   final GovernmentService service;
@@ -73,7 +74,7 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
             ),
             alignment: Alignment.center,
             child: Text(
-              option,
+              option.tr(),
               style: TextStyle(
                 color: isSelected
                     ? activeColor
@@ -91,7 +92,7 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
           TextField(
             controller: _othersControllers[qId],
             decoration: InputDecoration(
-              hintText: 'Please specify...',
+              hintText: 'Please specify...'.tr(),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -130,14 +131,14 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Eligibility Assessment'),
+        title: Text('Eligibility Assessment'.tr()),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: _isLoading ? const Center(child: CircularProgressIndicator()) 
-        : _questions.isEmpty ? const Center(child: Text("No questions for this service."))
+        : _questions.isEmpty ? Center(child: Text("No questions for this service.".tr()))
         : Column(
         children: [
           // Progress Header
@@ -163,14 +164,14 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Assessment Progress',
+                      'Assessment Progress'.tr(),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         color: Colors.grey[600],
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
-                      '$answeredQuestions of $totalQuestions',
+                      '$answeredQuestions ' + 'of'.tr() + ' $totalQuestions',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         color: Theme.of(context).primaryColor,
                         fontWeight: FontWeight.bold,
@@ -212,7 +213,7 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Applying for:',
+                          'Applying for:'.tr(),
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 14,
@@ -383,7 +384,7 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
               elevation: 0,
             ),
             child: Text(
-              'Submit Assessment',
+              'Submit Assessment'.tr(),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

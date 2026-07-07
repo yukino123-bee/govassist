@@ -7,6 +7,7 @@ import '../../widgets/service_card.dart';
 import 'service_detail_screen.dart';
 import '../../core/user_session.dart';
 import '../services/application_tracking_screen.dart';
+import '../../core/translations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<GovernmentService> _services = [];
-  List<AssessmentHistory> _assessments = [];
+  List<dynamic> _applications = [];
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -37,21 +38,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadData() async {
     final services = await ServiceData.fetchServices(query: _searchQuery);
-    final assessments = await ServiceData.fetchAssessments();
     
     int unread = 0;
+    List<dynamic> applications = [];
     final userId = UserSession().currentUser?['id']?.toString();
     if (userId != null) {
       final notifs = await ServiceData.fetchNotifications(userId);
       if (notifs['unreadCount'] != null) {
         unread = int.tryParse(notifs['unreadCount'].toString()) ?? 0;
       }
+      final appsData = await ServiceData.fetchApplications(userId);
+      if (appsData['applications'] != null) {
+        applications = appsData['applications'];
+      }
     }
 
     if (mounted) {
       setState(() {
         _services = services;
-        _assessments = assessments;
+        _applications = applications;
         _unreadCount = unread;
         _isLoading = false;
       });
@@ -177,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             const SizedBox(height: 32),
                             Text(
-                              'Welcome back,',
+                              'Welcome back,'.tr(),
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 color: Colors.white.withValues(alpha: 0.8),
                               ),
@@ -210,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   _loadData();
                                 },
                                 decoration: InputDecoration(
-                                  hintText: 'Search for government services...',
+                                  hintText: 'Search for government services...'.tr(),
                                   hintStyle: TextStyle(color: Colors.grey.shade400),
                                   prefixIcon: Icon(Icons.search, color: Theme.of(context).primaryColor),
                                   border: OutlineInputBorder(
@@ -235,36 +240,47 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SectionHeader(title: 'Recent Applications'),
+                    SectionHeader(title: 'Recent Applications'.tr()),
                     const SizedBox(height: 16),
                     _isLoading
                         ? const Center(child: CircularProgressIndicator())
-                        : _assessments.isEmpty
-                            ? const Text('You haven\'t submitted any applications yet.')
-                            : Card(
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  side: BorderSide(color: Colors.grey.shade200),
-                                ),
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Colors.blue.shade50,
-                                    child: Icon(Icons.pending_actions, color: Colors.blue.shade600),
-                                  ),
-                                  title: Text(_assessments.first.serviceTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                  subtitle: Text('Status: ${_assessments.first.isEligible ? 'Eligible' : 'Under Evaluation'}\nRef: ${_assessments.first.referenceNumber}'),
-                                  isThreeLine: true,
-                                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const ApplicationTrackingScreen(),
+                        : _applications.isEmpty
+                            ? Text('You haven\'t submitted any applications yet.'.tr())
+                            : Column(
+                                children: _applications.take(2).map((app) {
+                                  final status = app['status'] ?? 'Submitted';
+                                  Color color = Colors.blue;
+                                  if (status.toLowerCase() == 'approved') color = Colors.green;
+                                  if (status.toLowerCase() == 'rejected') color = Colors.red;
+                                  if (status.toLowerCase() == 'under review') color = Colors.orange;
+
+                                  return Card(
+                                    elevation: 0,
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      side: BorderSide(color: Colors.grey.shade200),
+                                    ),
+                                    child: ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundColor: color.withValues(alpha: 0.1),
+                                        child: Icon(Icons.description, color: color),
                                       ),
-                                    );
-                                  },
-                                ),
+                                      title: Text(app['service_title'] ?? 'Service Application'.tr(), style: const TextStyle(fontWeight: FontWeight.bold)),
+                                      subtitle: Text('Status: '.tr() + status + '\n' + 'Submitted on: '.tr() + (app['submitted_at'] ?? '')),
+                                      isThreeLine: true,
+                                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const ApplicationTrackingScreen(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
                               ),
                     const SizedBox(height: 32),
 
@@ -284,13 +300,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Provincial Announcement',
+                                  'Provincial Announcement'.tr(),
                                   style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
                                 ),
                                 const SizedBox(height: 4),
-                                const Text(
-                                  'Stay updated on the latest government programs.',
-                                  style: TextStyle(fontSize: 12),
+                                Text(
+                                  'Stay updated on the latest government programs.'.tr(),
+                                  style: const TextStyle(fontSize: 12),
                                 ),
                               ],
                             ),
@@ -300,12 +316,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 32),
 
-                    const SectionHeader(title: 'All Services'),
+                    SectionHeader(title: 'All Services'.tr()),
                     const SizedBox(height: 16),
                     _isLoading
                         ? const Center(child: CircularProgressIndicator())
                         : _services.isEmpty
-                            ? const Text('No services found.')
+                            ? Text('No services found.'.tr())
                             : ListView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
@@ -327,15 +343,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                     const SizedBox(height: 32),
                     
-                    const SectionHeader(title: 'Emergency Hotlines'),
+                    SectionHeader(title: 'Emergency Hotlines'.tr()),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Expanded(child: _buildHotlineCard(context, Icons.local_police, 'Police', '117', Colors.blue)),
+                        Expanded(child: _buildHotlineCard(context, Icons.local_police, 'Police'.tr(), '117', Colors.blue)),
                         const SizedBox(width: 16),
-                        Expanded(child: _buildHotlineCard(context, Icons.local_fire_department, 'Fire', '911', Colors.orange)),
+                        Expanded(child: _buildHotlineCard(context, Icons.local_fire_department, 'Fire'.tr(), '911', Colors.orange)),
                         const SizedBox(width: 16),
-                        Expanded(child: _buildHotlineCard(context, Icons.medical_services, 'Hospital', '143', Colors.red)),
+                        Expanded(child: _buildHotlineCard(context, Icons.medical_services, 'Hospital'.tr(), '143', Colors.red)),
                       ],
                     ),
                     const SizedBox(height: 32),

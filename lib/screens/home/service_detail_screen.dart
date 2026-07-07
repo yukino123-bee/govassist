@@ -5,6 +5,7 @@ import 'requirements_screen.dart';
 import '../../core/user_session.dart';
 import '../../data/service_data.dart';
 import '../profile/edit_profile_screen.dart';
+import '../../core/translations.dart';
 
 class ServiceDetailScreen extends StatelessWidget {
   final GovernmentService service;
@@ -15,7 +16,7 @@ class ServiceDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Service Details'),
+        title: Text('Service Details'.tr()),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -31,14 +32,14 @@ class ServiceDetailScreen extends StatelessWidget {
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                   const SizedBox(height: 24),
-                  const SectionHeader(title: 'Description'),
+                  SectionHeader(title: 'Description'.tr()),
                   const SizedBox(height: 8),
                   Text(
                     service.description,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 32),
-                  const SectionHeader(title: 'Application Procedure'),
+                  SectionHeader(title: 'Application Procedure'.tr()),
                   const SizedBox(height: 16),
                   Text(
                     service.procedures,
@@ -57,7 +58,7 @@ class ServiceDetailScreen extends StatelessWidget {
                         );
                       },
                       icon: const Icon(Icons.checklist),
-                      label: const Text('View Requirements'),
+                      label: Text('View Requirements'.tr()),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
@@ -99,7 +100,7 @@ class _ApplyButtonState extends State<_ApplyButton> {
 
     if (!isComplete) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete your profile and upload a valid ID before applying.')),
+        SnackBar(content: Text('Please complete your profile and upload a valid ID before applying.'.tr())),
       );
       Navigator.push(
         context,
@@ -115,7 +116,7 @@ class _ApplyButtonState extends State<_ApplyButton> {
 
     if (res['success'] == true) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Application submitted successfully!')),
+        SnackBar(content: Text('Application submitted successfully!'.tr())),
       );
       Navigator.pop(context); // Go back after applying
     } else {
@@ -130,7 +131,7 @@ class _ApplyButtonState extends State<_ApplyButton> {
     return _isLoading
         ? const Center(child: CircularProgressIndicator())
         : CustomButton(
-            text: 'Apply / Request Service',
+            text: 'Apply / Request Service'.tr(),
             onPressed: _handleApply,
           );
   }

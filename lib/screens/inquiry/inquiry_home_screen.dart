@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'submit_inquiry_screen.dart';
+import '../../core/translations.dart';
 
 class InquiryHomeScreen extends StatefulWidget {
   const InquiryHomeScreen({super.key});
@@ -23,8 +24,7 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
   final List<InquiryMessage> _messages = [
     InquiryMessage(
       id: 'welcome',
-      text:
-          'Hello! I am GovBot. Ask me about how to apply, who qualifies, or the requirements for our assistance programs.',
+      text: 'Hello! I am GovBot. Ask me about how to apply, who qualifies, or the requirements for our assistance programs.'.tr(),
       isUser: false,
       timestamp: DateTime.now(),
     ),
@@ -63,8 +63,8 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Could not initialize microphone. Please check app permissions.'),
+              SnackBar(
+                content: Text('Could not initialize microphone. Please check app permissions.'.tr()),
                 backgroundColor: Colors.red,
               ),
             );
@@ -75,7 +75,7 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Speech recognition not available on this device: $e'),
+              content: Text('Speech recognition not available on this device: '.tr() + e.toString()),
               backgroundColor: Colors.red,
             ),
           );
@@ -141,7 +141,7 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
       _messages.add(
         InquiryMessage(
           id: 'welcome',
-          text: 'Conversation cleared. Hello! I am GovBot. Ask me about how to apply, who qualifies, or the requirements for our assistance programs.',
+          text: 'Conversation cleared. '.tr() + 'Hello! I am GovBot. Ask me about how to apply, who qualifies, or the requirements for our assistance programs.'.tr(),
           isUser: false,
           timestamp: DateTime.now(),
         ),
@@ -238,18 +238,18 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('GovBot Assistant'),
+        title: Text('GovBot Assistant'.tr()),
         automaticallyImplyLeading: false,
         elevation: 1,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Clear Conversation',
+            tooltip: 'Clear Conversation'.tr(),
             onPressed: _clearConversation,
           ),
           IconButton(
             icon: const Icon(Icons.edit_document),
-            tooltip: 'Manual Inquiry',
+            tooltip: 'Manual Inquiry'.tr(),
             onPressed: () {
               Navigator.push(
                 context,
@@ -385,7 +385,7 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
                   child: TextField(
                     controller: _messageController,
                     decoration: InputDecoration(
-                      hintText: 'Type your question...',
+                      hintText: 'Type your question...'.tr(),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24),
                         borderSide: BorderSide.none,
