@@ -135,11 +135,11 @@ class ServiceData {
         return jsonResponse
             .map(
               (data) => AssessmentHistory(
-                id: data['id'],
+                id: data['id'].toString(),
                 serviceTitle: data['service_title'],
                 date: DateTime.parse(data['date']),
-                isEligible: data['is_eligible'] == 1,
-                referenceNumber: data['reference_number'],
+                isEligible: data['is_eligible'] == 1 || data['is_eligible'] == true,
+                referenceNumber: data['reference_number']?.toString() ?? '',
               ),
             )
             .toList();
@@ -182,7 +182,7 @@ class ServiceData {
         return jsonResponse
             .map(
               (data) => InquiryTicket(
-                id: data['id'],
+                id: data['id'].toString(),
                 subject: data['subject'],
                 status: data['status'],
                 dateSubmitted: DateTime.parse(data['date_submitted']),
@@ -230,9 +230,9 @@ class ServiceData {
         return jsonResponse
             .map(
               (data) => InquiryMessage(
-                id: data['id'],
+                id: data['id'].toString(),
                 text: data['message_text'],
-                isUser: data['is_user'] == 1,
+                isUser: data['is_user'] == 1 || data['is_user'] == true,
                 timestamp: DateTime.parse(data['timestamp']),
               ),
             )

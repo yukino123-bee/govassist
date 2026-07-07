@@ -65,4 +65,32 @@ function sendVerificationEmail($toEmail, $otpCode) {
         return false;
     }
 }
+
+/**
+ * Triggers the verification email asynchronously via a fast local HTTP request.
+ */
+function sendVerificationEmailAsync($toEmail, $otpCode) {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+    $host = $_SERVER['HTTP_HOST'];
+    $uriPath = rtrim(dirname($_SERVER['REQUEST_URI']), '/');
+    $url = $protocol . "://" . $host . $uriPath . "/async_mail.php";
+
+    $ch = curl_init($url);
+    // Timeout set to 1000ms to ensure local server has time to receive it
+    curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1000); 
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+        'email' => $toEmail,
+        'code' => $otpCode
+    ]));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    // Optional: ignore SSL verification for local dev
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    
+    curl_exec($ch);
+    curl_close($ch);
+    
+    return true;
+}
 ?>

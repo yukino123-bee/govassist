@@ -3,12 +3,16 @@
 
 require_once 'cors.php';
 require_once 'db.php';
+require_once 'auth_middleware.php';
+
+$user_id = getAuthenticatedUser();
 
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
     try {
-        $stmt = $pdo->query("SELECT id, subject, status, date_submitted FROM inquiries ORDER BY date_submitted DESC");
+        $stmt = $pdo->prepare("SELECT id, subject, status, date_submitted FROM inquiries WHERE user_id = ? ORDER BY date_submitted DESC");
+        $stmt->execute([$user_id]);
         $inquiries = $stmt->fetchAll();
         
         header('Content-Type: application/json');
@@ -24,11 +28,12 @@ if ($method === 'GET') {
         try {
             $pdo->beginTransaction();
             
-            $stmt = $pdo->prepare("INSERT INTO inquiries (id, subject, status, date_submitted) VALUES (?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO inquiries (id, user_id, subject, status, date_submitted) VALUES (?, ?, ?, ?, ?)");
             $ticketId = 'TKT-' . strtoupper(substr(md5(uniqid()), 0, 6));
             
             $stmt->execute([
                 $ticketId,
+                $user_id,
                 $input['subject'],
                 $input['status'],
                 $input['dateSubmitted']

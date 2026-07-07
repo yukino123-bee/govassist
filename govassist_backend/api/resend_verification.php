@@ -35,8 +35,8 @@ if ($method === 'POST') {
             $updateStmt = $pdo->prepare("UPDATE users SET verification_code = ? WHERE id = ?");
             $updateStmt->execute([$verificationCode, $user['id']]);
 
-            // Send actual email
-            $emailSent = sendVerificationEmail($input['email'], $verificationCode);
+            // Send actual email asynchronously to avoid blocking the user
+            $emailSent = sendVerificationEmailAsync($input['email'], $verificationCode);
 
             http_response_code(200);
             echo json_encode([

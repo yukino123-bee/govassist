@@ -34,8 +34,8 @@ if ($method === 'POST') {
                 $verificationCode
             ]);
             
-            // Send actual email
-            $emailSent = sendVerificationEmail($input['email'], $verificationCode);
+            // Send actual email asynchronously to avoid blocking the user
+            $emailSent = sendVerificationEmailAsync($input['email'], $verificationCode);
             
             http_response_code(200);
             echo json_encode([

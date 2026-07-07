@@ -48,17 +48,21 @@ CREATE TABLE IF NOT EXISTS faqs (
 
 CREATE TABLE IF NOT EXISTS assessments (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     service_title VARCHAR(255) NOT NULL,
     date DATETIME NOT NULL,
     is_eligible BOOLEAN NOT NULL,
-    reference_number VARCHAR(100) NOT NULL
+    reference_number VARCHAR(100) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS inquiries (
     id VARCHAR(50) PRIMARY KEY,
+    user_id INT NOT NULL,
     subject VARCHAR(255) NOT NULL,
     status VARCHAR(50) NOT NULL,
-    date_submitted DATETIME NOT NULL
+    date_submitted DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS messages (
