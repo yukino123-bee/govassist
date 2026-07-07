@@ -108,7 +108,31 @@ class _EligibilityHomeScreenState extends State<EligibilityHomeScreen> {
                       ),
                     ),
                     title: Text(history.serviceTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text(DateFormat('MMM dd, yyyy').format(date)),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 4),
+                        Text(DateFormat('MMM dd, yyyy • hh:mm a').format(date)),
+                        if (history.referenceNumber.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.blueGrey.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'Ref: ${history.referenceNumber}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueGrey,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                     trailing: Text(
                       isEligible ? 'Eligible' : 'Not Eligible',
                       style: TextStyle(
