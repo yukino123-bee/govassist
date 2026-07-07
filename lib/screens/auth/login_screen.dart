@@ -7,6 +7,10 @@ import 'forgot_password_screen.dart';
 import 'otp_verification_screen.dart';
 import '../../data/service_data.dart';
 import '../../core/user_session.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:local_auth/local_auth.dart';
+import 'dart:convert';
+import '../../core/app_settings.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,6 +51,11 @@ class _LoginScreenState extends State<LoginScreen> {
     if (mounted) {
       if (result['success'] == true) {
         UserSession().setUser(result['user']);
+        
+        // Cache user for biometric login
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('cached_user', json.encode(result['user']));
+        
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const MainLayout()),
@@ -54,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         if (result['unverified'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please verify your email to login.')),
+            SnackBar(content: Text('Please verify your email to login.'.tr())),
           );
           Navigator.push(
             context,
@@ -64,10 +73,55 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result['error'] ?? 'Login failed')),
+            SnackBar(content: Text(result['error'] ?? 'Login failed'.tr())),
           );
         }
       }
+    }
+  }
+
+  Future<void> _biometricAuth() async {
+    final prefs = await SharedPreferences.getInstance();
+    final cachedUserString = prefs.getString('cached_user');
+    
+    if (cachedUserString == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No saved user found. Please login with password first.'.tr())),
+        );
+      }
+      return;
+    }
+
+    try {
+      final LocalAuthentication auth = LocalAuthentication();
+      final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+      final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+      
+      if (!canAuthenticate) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Biometric authentication not supported on this device.'.tr())),
+          );
+        }
+        return;
+      }
+
+      final bool didAuthenticate = await auth.authenticate(
+        localizedReason: 'Please authenticate to login'.tr(),
+        options: const AuthenticationOptions(biometricOnly: true),
+      );
+
+      if (didAuthenticate && mounted) {
+        final cachedUser = json.decode(cachedUserString);
+        UserSession().setUser(cachedUser);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainLayout()),
+        );
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -107,22 +161,22 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Sign in to access your services',
+                'Sign in to access your services'.tr(),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 48),
               CustomTextField(
                 controller: _emailController,
-                label: 'Email',
-                hint: 'Enter your email address',
+                label: 'Email'.tr(),
+                hint: 'Enter your email address'.tr(),
                 prefixIcon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
               CustomTextField(
                 controller: _passwordController,
-                label: 'Password',
-                hint: 'Enter your password',
+                label: 'Password'.tr(),
+                hint: 'Enter your password'.tr(),
                 prefixIcon: Icons.lock_outline,
                 isPassword: true,
               ),
@@ -136,22 +190,35 @@ class _LoginScreenState extends State<LoginScreen> {
                       MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
                     );
                   },
-                  child: const Text('Forgot Password?'),
+                  child: Text('Forgot Password?'.tr()),
                 ),
               ),
               const SizedBox(height: 24),
               _isLoading
                   ? const CircularProgressIndicator()
                   : CustomButton(
-                      text: 'Login',
+                      text: 'Login'.tr(),
                       onPressed: _login,
                     ),
+              const SizedBox(height: 16),
+              ValueListenableBuilder<bool>(
+                valueListenable: AppSettings.biometricLogin,
+                builder: (context, useBiometric, _) {
+                  if (useBiometric) {
+                    return IconButton(
+                      icon: const Icon(Icons.fingerprint, size: 48, color: AppTheme.primaryColor),
+                      onPressed: _biometricAuth,
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Don\'t have an account?',
+                    'Don\'t have an account?'.tr(),
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   TextButton(
@@ -161,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         MaterialPageRoute(builder: (context) => const RegisterScreen()),
                       );
                     },
-                    child: const Text('Register'),
+                    child: Text('Register'.tr()),
                   ),
                 ],
               ),

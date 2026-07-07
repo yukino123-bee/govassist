@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/app_settings.dart';
+
+import '../../core/translations.dart';
+
 class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({super.key});
 
@@ -9,88 +13,71 @@ class AppSettingsScreen extends StatefulWidget {
 }
 
 class _AppSettingsScreenState extends State<AppSettingsScreen> {
-  bool _pushNotifications = true;
-  bool _emailNotifications = false;
-  bool _darkMode = false;
-  bool _biometricLogin = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSettings();
-  }
-
-  Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _pushNotifications = prefs.getBool('push_notifications') ?? true;
-      _emailNotifications = prefs.getBool('email_notifications') ?? false;
-      _darkMode = prefs.getBool('dark_mode') ?? false;
-      _biometricLogin = prefs.getBool('biometric_login') ?? true;
-    });
-  }
-
-  Future<void> _saveSetting(String key, bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(key, value);
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('App Settings'),
+        title: Text('App Settings'.tr()),
       ),
       body: ListView(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text('Notifications', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text('Notifications'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
           ),
-          SwitchListTile(
-            title: const Text('Push Notifications'),
-            subtitle: const Text('Receive alerts on your device'),
-            value: _pushNotifications,
-            onChanged: (val) {
-              setState(() => _pushNotifications = val);
-              _saveSetting('push_notifications', val);
+          ValueListenableBuilder<bool>(
+            valueListenable: AppSettings.pushNotifications,
+            builder: (context, pushNotif, _) {
+              return SwitchListTile(
+                title: Text('Push Notifications'.tr()),
+                subtitle: Text('Receive alerts on your device'.tr()),
+                value: pushNotif,
+                onChanged: (val) => AppSettings.setPushNotifications(val),
+              );
             },
           ),
-          SwitchListTile(
-            title: const Text('Email Notifications'),
-            subtitle: const Text('Receive updates via email'),
-            value: _emailNotifications,
-            onChanged: (val) {
-              setState(() => _emailNotifications = val);
-              _saveSetting('email_notifications', val);
-            },
-          ),
-          const Divider(),
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text('Preferences', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-          ),
-          SwitchListTile(
-            title: const Text('Dark Mode'),
-            subtitle: const Text('Switch to dark theme'),
-            value: _darkMode,
-            onChanged: (val) {
-              setState(() => _darkMode = val);
-              _saveSetting('dark_mode', val);
+          ValueListenableBuilder<bool>(
+            valueListenable: AppSettings.emailNotifications,
+            builder: (context, emailNotif, _) {
+              return SwitchListTile(
+                title: Text('Email Notifications'.tr()),
+                subtitle: Text('Receive updates via email'.tr()),
+                value: emailNotif,
+                onChanged: (val) => AppSettings.setEmailNotifications(val),
+              );
             },
           ),
           const Divider(),
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text('Security', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text('Preferences'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
           ),
-          SwitchListTile(
-            title: const Text('Biometric Login'),
-            subtitle: const Text('Use fingerprint or Face ID to login'),
-            value: _biometricLogin,
-            onChanged: (val) {
-              setState(() => _biometricLogin = val);
-              _saveSetting('biometric_login', val);
+          ValueListenableBuilder<bool>(
+            valueListenable: AppSettings.darkMode,
+            builder: (context, isDark, _) {
+              return SwitchListTile(
+                title: Text('Dark Mode'.tr()),
+                subtitle: Text('Switch to dark theme'.tr()),
+                value: isDark,
+                onChanged: (val) => AppSettings.setDarkMode(val),
+              );
+            },
+          ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text('Security'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: AppSettings.biometricLogin,
+            builder: (context, useBiometric, _) {
+              return SwitchListTile(
+                title: Text('Biometric Login'.tr()),
+                subtitle: Text('Use fingerprint or Face ID to login'.tr()),
+                value: useBiometric,
+                onChanged: (val) => AppSettings.setBiometricLogin(val),
+              );
             },
           ),
         ],
