@@ -9,8 +9,12 @@ try {
 
     // To prevent foreign key constraint failures on existing rows (where user_id would default to 0),
     // we must empty the tables first or set a valid default. Emptying is safest for this schema change.
+    // Disable FK checks so we can truncate tables referenced by other tables (like inquiries by messages)
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
     $pdo->exec("TRUNCATE TABLE assessments");
     $pdo->exec("TRUNCATE TABLE inquiries");
+    $pdo->exec("TRUNCATE TABLE messages");
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
 
     // Add user_id to assessments if it doesn't exist
     try {
