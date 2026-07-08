@@ -15,11 +15,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
  * @return bool True if successful, false otherwise
  */
 function sendVerificationEmail($toEmail, $otpCode) {
-    // Split key to prevent GitHub from blocking the push via Secret Scanning
-    // Kept inside this file so your automated pipeline successfully deploys it!
-    $apiKey = 'xkeysib-' . 'a9ec5218695e3e3203a7f7c14e2e296c44f68166ef8fca921546828935b93ab6-' . 'oaL7iLJs0lSOmnxP';
+    $subject = "GovAssist - Verify your email address";
     
-    $htmlContent = "
+    $message = "
         <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;'>
             <h2 style='color: #2c3e50; text-align: center;'>Welcome to GovAssist!</h2>
             <p>Thank you for registering. To complete your registration and verify your email address, please use the following verification code:</p>
@@ -33,40 +31,17 @@ function sendVerificationEmail($toEmail, $otpCode) {
         </div>
     ";
 
-    $data = [
-        'sender' => [
-            'name' => 'GovAssist',
-            'email' => 'cagatinmark26@gmail.com'
-        ],
-        'to' => [
-            ['email' => $toEmail]
-        ],
-        'subject' => 'GovAssist - Verify your email address',
-        'htmlContent' => $htmlContent
-    ];
+    // Awardspace requires the sender email to match your domain!
+    $headers = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-type:text/html;charset=UTF-8\r\n";
+    $headers .= "From: GovAssist <admin@govassist.atwebpages.com>\r\n";
+    $headers .= "Reply-To: admin@govassist.atwebpages.com\r\n";
 
-    $ch = curl_init('https://api.brevo.com/v3/smtp/email');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'accept: application/json',
-        'api-key: ' . $apiKey,
-        'content-type: application/json'
-    ]);
-    
-    // Ignore SSL verification for restrictive shared servers
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode === 201 || $httpCode === 200 || $httpCode === 202) {
+    // Use Awardspace's internal sendmail binary (bypasses outbound blocking)
+    if (mail($toEmail, $subject, $message, $headers)) {
         return true;
     } else {
-        $errorMsg = date('Y-m-d H:i:s') . " - Brevo API Error ($httpCode): $response\n";
+        $errorMsg = date('Y-m-d H:i:s') . " - Native PHP mail() failed to send.\n";
         file_put_contents(__DIR__ . '/error_log.txt', $errorMsg, FILE_APPEND);
         return false;
     }
