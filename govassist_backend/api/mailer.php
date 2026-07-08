@@ -61,6 +61,8 @@ function sendVerificationEmail($toEmail, $otpCode) {
         $mail->send();
         return true;
     } catch (Exception $e) {
+        $errorMsg = date('Y-m-d H:i:s') . " - GovAssist Mailer Error: {$mail->ErrorInfo}\n";
+        file_put_contents(__DIR__ . '/error_log.txt', $errorMsg, FILE_APPEND);
         error_log("GovAssist Mailer Error: {$mail->ErrorInfo}");
         return false;
     }
