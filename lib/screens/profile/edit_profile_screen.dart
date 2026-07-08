@@ -3,6 +3,8 @@ import '../../widgets/custom_widgets.dart';
 import '../../core/user_session.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/service_data.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -101,10 +103,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     if (res['success'] == true && mounted) {
       UserSession().setUser(res['user']);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully!')),
-      );
-      Navigator.pop(context);
+      
+      // Update SharedPreferences cache so the changes persist when the app restarts
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('cached_user', json.encode(res['user']));
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile updated successfully!')),
+        );
+        Navigator.pop(context);
+      }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
