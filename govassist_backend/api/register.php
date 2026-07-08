@@ -34,11 +34,6 @@ if ($method === 'POST') {
                 $verificationCode
             ]);
             
-            // Log OTP to a file for local development testing
-            $logFile = __DIR__ . '/otp_log.txt';
-            $logMessage = date('Y-m-d H:i:s') . " - [REGISTER] OTP for {$input['email']} is: $verificationCode\n";
-            file_put_contents($logFile, $logMessage, FILE_APPEND);
-
             // Send actual email asynchronously to avoid blocking the user
             $emailSent = sendVerificationEmailAsync($input['email'], $verificationCode);
             

@@ -35,11 +35,6 @@ if ($method === 'POST') {
             $updateStmt = $pdo->prepare("UPDATE users SET verification_code = ? WHERE id = ?");
             $updateStmt->execute([$verificationCode, $user['id']]);
 
-            // Log OTP to a file for local development testing
-            $logFile = __DIR__ . '/otp_log.txt';
-            $logMessage = date('Y-m-d H:i:s') . " - [RESEND] OTP for {$input['email']} is: $verificationCode\n";
-            file_put_contents($logFile, $logMessage, FILE_APPEND);
-
             // Send actual email asynchronously to avoid blocking the user
             $emailSent = sendVerificationEmailAsync($input['email'], $verificationCode);
 
