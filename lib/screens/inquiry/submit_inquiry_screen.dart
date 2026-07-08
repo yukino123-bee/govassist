@@ -107,7 +107,7 @@ class _SubmitInquiryScreenState extends State<SubmitInquiryScreen> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: _selectedCategory,
+              initialValue: _selectedCategory,
               hint: Text('Select a program or category'.tr()),
               decoration: InputDecoration(
                 border: OutlineInputBorder(

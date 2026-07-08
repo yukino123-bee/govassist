@@ -9,13 +9,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/service_data.dart';
 import '../../core/translations.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
         title: Text('Profile & Settings'.tr()),
         automaticallyImplyLeading: false,
@@ -39,7 +43,7 @@ class ProfileScreen extends StatelessWidget {
                       'Update your personal details'.tr(),
                       Icons.person_outline,
                       Theme.of(context).primaryColor,
-                      () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen())),
+                      () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen())).then((_) => setState(() {})),
                     ),
                     _buildProfileMenu(
                       context,
@@ -89,10 +93,9 @@ class ProfileScreen extends StatelessWidget {
                         style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.redAccent.withOpacity(0.5), width: 1.5),
+                        side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.5), width: 1.5),
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        backgroundColor: Colors.red.shade50,
+                        backgroundColor: Colors.red.withValues(alpha: 0.1),
                       ),
                     ),
                   ),
@@ -115,7 +118,7 @@ class ProfileScreen extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).primaryColor.withOpacity(0.3),
+            color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -127,14 +130,14 @@ class ProfileScreen extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 3),
+              border: Border.all(color: Theme.of(context).colorScheme.surface, width: 3),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, spreadRadius: 2),
+                BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, spreadRadius: 2),
               ],
             ),
             child: CircleAvatar(
               radius: 45,
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.surface,
               backgroundImage: user?['profile_picture'] != null
                   ? NetworkImage('${ServiceData.baseUrl.replaceAll('/api', '')}/${user!['profile_picture']}')
                   : null,
@@ -151,7 +154,7 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             user?['email'] ?? 'guest@example.com',
-            style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 16, letterSpacing: 1.2),
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 16, letterSpacing: 1.2),
           ),
         ],
       ),
@@ -166,7 +169,7 @@ class ProfileScreen extends StatelessWidget {
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
-          color: Colors.grey.shade700,
+          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.grey.shade700,
           letterSpacing: 0.5,
         ),
       ),
@@ -191,7 +194,7 @@ class ProfileScreen extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: iconColor.withOpacity(0.1),
+          color: iconColor.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: iconColor, size: 24),
@@ -219,7 +222,7 @@ class ProfileScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             shape: BoxShape.rectangle,
             borderRadius: BorderRadius.circular(20),
             boxShadow: const [
@@ -269,9 +272,9 @@ class ProfileScreen extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        side: BorderSide(color: Colors.grey.shade300),
+                        side: BorderSide(color: Theme.of(context).dividerColor),
                       ),
-                      child: Text('Cancel'.tr(), style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.bold)),
+                      child: Text('Cancel'.tr(), style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontWeight: FontWeight.bold)),
                     ),
                   ),
                   const SizedBox(width: 12),

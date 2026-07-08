@@ -37,7 +37,12 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 50,
+      maxWidth: 1000,
+      maxHeight: 1000,
+    );
     
     if (pickedFile != null) {
       setState(() {
@@ -108,7 +113,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                     const Text('Select Service:', style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
-                      value: _selectedServiceId,
+                      initialValue: _selectedServiceId,
                       decoration: const InputDecoration(border: OutlineInputBorder()),
                       hint: const Text('Select a Service'),
                       items: _services.map((srv) {

@@ -36,21 +36,33 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  Future<void> _loadData() async {
-    final services = await ServiceData.fetchServices(query: _searchQuery);
+  Future<void> _loadData({bool forceRefresh = false}) async {
+    if (mounted && _services.isEmpty) {
+      setState(() => _isLoading = true);
+    }
     
+    final userId = UserSession().currentUser?['id']?.toString();
+    
+    // Create futures for parallel execution
+    final servicesFuture = ServiceData.fetchServices(query: _searchQuery, forceRefresh: forceRefresh);
+    final notifsFuture = userId != null ? ServiceData.fetchNotifications(userId) : Future.value({});
+    final appsFuture = userId != null ? ServiceData.fetchApplications(userId) : Future.value({});
+
+    // Wait for all futures simultaneously to dramatically speed up loading
+    final results = await Future.wait([servicesFuture, notifsFuture, appsFuture]);
+    
+    final services = results[0] as List<GovernmentService>;
+    final notifs = results[1] as Map<String, dynamic>;
+    final appsData = results[2] as Map<String, dynamic>;
+
     int unread = 0;
     List<dynamic> applications = [];
-    final userId = UserSession().currentUser?['id']?.toString();
-    if (userId != null) {
-      final notifs = await ServiceData.fetchNotifications(userId);
-      if (notifs['unreadCount'] != null) {
-        unread = int.tryParse(notifs['unreadCount'].toString()) ?? 0;
-      }
-      final appsData = await ServiceData.fetchApplications(userId);
-      if (appsData['applications'] != null) {
-        applications = appsData['applications'];
-      }
+    
+    if (notifs['unreadCount'] != null) {
+      unread = int.tryParse(notifs['unreadCount'].toString()) ?? 0;
+    }
+    if (appsData['applications'] != null) {
+      applications = appsData['applications'];
     }
 
     if (mounted) {
@@ -68,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: _loadData,
+          onRefresh: () => _loadData(forceRefresh: true),
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
@@ -198,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             const SizedBox(height: 24),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.surface,
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
@@ -216,14 +228,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 },
                                 decoration: InputDecoration(
                                   hintText: 'Search for government services...'.tr(),
-                                  hintStyle: TextStyle(color: Colors.grey.shade400),
+                                  hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey.shade400),
                                   prefixIcon: Icon(Icons.search, color: Theme.of(context).primaryColor),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(16),
                                     borderSide: BorderSide.none,
                                   ),
                                   filled: true,
-                                  fillColor: Colors.white,
+                                  fillColor: Theme.of(context).colorScheme.surface,
                                   contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                                 ),
                               ),
@@ -267,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Icon(Icons.description, color: color),
                                       ),
                                       title: Text(app['service_title'] ?? 'Service Application'.tr(), style: const TextStyle(fontWeight: FontWeight.bold)),
-                                      subtitle: Text('Status: '.tr() + status + '\n' + 'Submitted on: '.tr() + (app['submitted_at'] ?? '')),
+                                      subtitle: Text('${'Status: '.tr()} $status\n${'Submitted on: '.tr()} ${app['submitted_at'] ?? ''}'),
                                       isThreeLine: true,
                                       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                                       onTap: () {

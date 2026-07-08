@@ -49,14 +49,16 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
           return RadioListTile<String>(
             title: Text(langName.tr()),
             value: langCode,
+            // ignore: deprecated_member_use
             groupValue: _selectedLanguage,
+            // ignore: deprecated_member_use
             onChanged: (value) {
               setState(() {
                 _selectedLanguage = value!;
               });
               _saveLanguage(value!);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Language'.tr() + ' -> ' + langName.tr())),
+                SnackBar(content: Text('${'Language'.tr()} -> ${langName.tr()}')),
               );
             },
           );

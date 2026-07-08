@@ -26,7 +26,7 @@ class ServiceCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
-                  backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                  backgroundColor: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
                   child: Icon(Icons.description, color: Theme.of(context).colorScheme.secondary),
                 ),
                 const SizedBox(width: 16),

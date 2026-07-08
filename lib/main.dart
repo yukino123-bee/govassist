@@ -25,6 +25,7 @@ class GovAssistApp extends StatelessWidget {
           valueListenable: AppTranslations.currentLanguage,
           builder: (context, lang, child) {
             return MaterialApp(
+              key: ValueKey(lang),
               title: 'GovAssist',
               debugShowCheckedModeBanner: false,
               theme: AppTheme.lightTheme,

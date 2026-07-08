@@ -89,15 +89,15 @@ class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData(
       primaryColor: primaryColor,
-      scaffoldBackgroundColor: const Color(0xFF111827),
+      scaffoldBackgroundColor: const Color(0xFF000000), // True black background
       colorScheme: const ColorScheme.dark(
         primary: primaryColor,
         secondary: secondaryColor,
-        surface: Color(0xFF1F2937),
+        surface: Color(0xFF121212), // Sleek very dark gray for surfaces
         error: errorColor,
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF1F2937),
+        backgroundColor: Color(0xFF000000),
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -126,15 +126,15 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFF374151),
+        fillColor: const Color(0xFF1A1A1A), // Darker inputs
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF4B5563)),
+          borderSide: const BorderSide(color: Color(0xFF2C2C2C)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF4B5563)),
+          borderSide: const BorderSide(color: Color(0xFF2C2C2C)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -153,17 +153,14 @@ class AppTheme {
         bodyMedium: TextStyle(color: Colors.white70, fontSize: 14),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Color(0xFF1F2937),
+        backgroundColor: Color(0xFF121212),
         selectedItemColor: primaryColor,
         unselectedItemColor: Colors.white54,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
-      cardTheme: CardTheme(
-        color: const Color(0xFF1F2937),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-      dividerColor: const Color(0xFF374151),
+      cardColor: const Color(0xFF121212),
+      dividerColor: const Color(0xFF2C2C2C),
     );
   }
 }

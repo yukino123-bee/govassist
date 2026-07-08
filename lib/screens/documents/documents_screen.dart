@@ -118,7 +118,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryColor.withOpacity(0.1),
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.description, color: AppTheme.primaryColor),
@@ -128,7 +128,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               trailing: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(doc.verificationStatus).withOpacity(0.1),
+                  color: _getStatusColor(doc.verificationStatus).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: _getStatusColor(doc.verificationStatus)),
                 ),

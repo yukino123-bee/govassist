@@ -65,11 +65,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     if (result['success'] == true) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            result['mock_email_otp'] != null 
-                ? '${result['message'] ?? 'OTP resent!'} (Mock OTP: ${result['mock_email_otp']})'
-                : result['message'] ?? 'OTP resent!',
-          ),
+          content: Text(result['message'] ?? 'OTP resent!'),
         ),
       );
     } else {

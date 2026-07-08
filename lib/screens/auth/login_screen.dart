@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:local_auth/local_auth.dart';
 import 'dart:convert';
 import '../../core/app_settings.dart';
+import '../../core/translations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -56,10 +57,12 @@ class _LoginScreenState extends State<LoginScreen> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('cached_user', json.encode(result['user']));
         
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainLayout()),
-        );
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MainLayout()),
+          );
+        }
       } else {
         if (result['unverified'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -109,7 +112,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final bool didAuthenticate = await auth.authenticate(
         localizedReason: 'Please authenticate to login'.tr(),
-        options: const AuthenticationOptions(biometricOnly: true),
       );
 
       if (didAuthenticate && mounted) {
@@ -121,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 

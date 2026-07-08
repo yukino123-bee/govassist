@@ -15,9 +15,9 @@ class ChatInterfaceScreen extends StatefulWidget {
 class _ChatInterfaceScreenState extends State<ChatInterfaceScreen> {
   final TextEditingController _messageController = TextEditingController();
   
-  stt.SpeechToText _speechToText = stt.SpeechToText();
+  final stt.SpeechToText _speechToText = stt.SpeechToText();
   bool _isListening = false;
-  FlutterTts _flutterTts = FlutterTts();
+  final FlutterTts _flutterTts = FlutterTts();
 
   @override
   void initState() {
@@ -116,7 +116,11 @@ class _ChatInterfaceScreenState extends State<ChatInterfaceScreen> {
                     margin: const EdgeInsets.only(bottom: 12.0),
                     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                     decoration: BoxDecoration(
-                      color: isUser ? Theme.of(context).primaryColor : Colors.grey.shade200,
+                      color: isUser
+                          ? Theme.of(context).primaryColor
+                          : Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey.shade800
+                              : Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(16).copyWith(
                         bottomRight: isUser ? const Radius.circular(0) : const Radius.circular(16),
                         bottomLeft: isUser ? const Radius.circular(16) : const Radius.circular(0),
@@ -128,7 +132,9 @@ class _ChatInterfaceScreenState extends State<ChatInterfaceScreen> {
                         Text(
                           message.text,
                           style: TextStyle(
-                            color: isUser ? Colors.white : Colors.black87,
+                            color: isUser || Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black87,
                             fontSize: 15,
                             height: 1.4,
                           ),
@@ -138,7 +144,9 @@ class _ChatInterfaceScreenState extends State<ChatInterfaceScreen> {
                           DateFormat('hh:mm a').format(message.timestamp),
                           style: TextStyle(
                             fontSize: 10,
-                            color: isUser ? Colors.white70 : Colors.black54,
+                            color: isUser || Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white70
+                                : Colors.black54,
                           ),
                         ),
                       ],
@@ -151,10 +159,10 @@ class _ChatInterfaceScreenState extends State<ChatInterfaceScreen> {
           Container(
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   spreadRadius: 1,
                   blurRadius: 3,
                   offset: const Offset(0, -1),
@@ -181,7 +189,7 @@ class _ChatInterfaceScreenState extends State<ChatInterfaceScreen> {
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
-                      fillColor: Colors.grey.shade100,
+                      fillColor: Theme.of(context).inputDecorationTheme.fillColor,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     ),
                     onSubmitted: (_) => _sendMessage(),

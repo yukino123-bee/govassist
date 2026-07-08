@@ -58,6 +58,11 @@ function sendVerificationEmail($toEmail, $otpCode) {
         ";
         $mail->AltBody = "Welcome to GovAssist! Your verification code is: {$otpCode}";
 
+        // Log OTP to a file for local development testing
+        $logFile = __DIR__ . '/otp_log.txt';
+        $logMessage = date('Y-m-d H:i:s') . " - OTP for $toEmail is: $otpCode\n";
+        file_put_contents($logFile, $logMessage, FILE_APPEND);
+
         $mail->send();
         return true;
     } catch (Exception $e) {
@@ -72,6 +77,14 @@ function sendVerificationEmail($toEmail, $otpCode) {
 function sendVerificationEmailAsync($toEmail, $otpCode) {
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
     $host = $_SERVER['HTTP_HOST'];
+    
+    // When flutter calls from Android emulator, HTTP_HOST is 10.0.2.2, which the host PC cannot curl to.
+    // In this specific local dev case, we force the local loopback address.
+    // For the deployed production system, it will correctly use the real domain.
+    if ($host === '10.0.2.2' || $host === 'localhost') {
+        $host = '127.0.0.1';
+    }
+
     $uriPath = rtrim(dirname($_SERVER['REQUEST_URI']), '/');
     $url = $protocol . "://" . $host . $uriPath . "/async_mail.php";
 
@@ -81,14 +94,19 @@ function sendVerificationEmailAsync($toEmail, $otpCode) {
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
         'email' => $toEmail,
-        'code' => $otpCode
+        'code' => $otpCode,
+        'token' => 'govassist_internal_async_secret_2026'
     ]));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     // Optional: ignore SSL verification for local dev
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     
-    curl_exec($ch);
+    $response = curl_exec($ch);
+    $error = curl_error($ch);
+    if ($error) {
+        file_put_contents(__DIR__ . '/curl_error.log', date('Y-m-d H:i:s') . " - cURL Error: " . $error . " - URL: " . $url . "\n", FILE_APPEND);
+    }
     curl_close($ch);
     
     return true;

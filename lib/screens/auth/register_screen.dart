@@ -60,11 +60,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (mounted) {
       if (result['success'] == true) {
-        final mockOtp = result['mock_email_otp'];
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Registration successful! (Mock OTP: $mockOtp)'),
-            duration: const Duration(seconds: 5),
+          const SnackBar(
+            content: Text('Registration successful! Please check your email.'),
+            duration: Duration(seconds: 5),
           ),
         );
         Navigator.pushReplacement(

@@ -56,7 +56,7 @@ class _EligibilityHomeScreenState extends State<EligibilityHomeScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -102,7 +102,7 @@ class _EligibilityHomeScreenState extends State<EligibilityHomeScreen> {
                   margin: const EdgeInsets.only(bottom: 12),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: isEligible ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                      backgroundColor: isEligible ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
                       child: Icon(
                         isEligible ? Icons.check : Icons.close,
                         color: isEligible ? Colors.green : Colors.red,
@@ -119,7 +119,7 @@ class _EligibilityHomeScreenState extends State<EligibilityHomeScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: Colors.blueGrey.withOpacity(0.1),
+                              color: Colors.blueGrey.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(

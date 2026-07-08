@@ -91,10 +91,10 @@ class _ApplicationTrackingScreenState extends State<ApplicationTrackingScreen> {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            Text('Submitted on: '.tr() + '${app['submitted_at']}'),
+                            Text('${'Submitted on: '.tr()} ${app['submitted_at']}'),
                             if (app['updated_at'] != null && app['updated_at'] != app['submitted_at']) ...[
                               const SizedBox(height: 4),
-                              Text('Last updated: '.tr() + '${app['updated_at']}'),
+                              Text('${'Last updated: '.tr()} ${app['updated_at']}'),
                             ]
                           ],
                         ),

@@ -283,7 +283,9 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
                     decoration: BoxDecoration(
                       color: isUser
                           ? Theme.of(context).primaryColor
-                          : Colors.grey.shade200,
+                          : Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey.shade800
+                              : Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(16).copyWith(
                         bottomRight: isUser
                             ? const Radius.circular(0)
@@ -301,7 +303,9 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
                         Text(
                           message.text,
                           style: TextStyle(
-                            color: isUser ? Colors.white : Colors.black87,
+                            color: isUser || Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black87,
                             fontSize: 15,
                             height: 1.4,
                           ),
@@ -311,7 +315,9 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
                           DateFormat('hh:mm a').format(message.timestamp),
                           style: TextStyle(
                             fontSize: 10,
-                            color: isUser ? Colors.white70 : Colors.black54,
+                            color: isUser || Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white70
+                                : Colors.black54,
                           ),
                         ),
                       ],
@@ -338,9 +344,9 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
                       bottom: 8.0,
                     ),
                     child: ActionChip(
-                      backgroundColor: Colors.white,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       side: BorderSide(
-                        color: Theme.of(context).primaryColor.withOpacity(0.3),
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
                       ),
                       label: Text(
                         faq.question,
@@ -361,10 +367,10 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
           Container(
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   spreadRadius: 1,
                   blurRadius: 3,
                   offset: const Offset(0, -1),
@@ -391,7 +397,7 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
-                      fillColor: Colors.grey.shade100,
+                      fillColor: Theme.of(context).inputDecorationTheme.fillColor,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 10,

@@ -18,9 +18,9 @@ if (function_exists('fastcgi_finish_request')) {
 
 require_once 'mailer.php';
 
-// Only allow local requests
-$remote_addr = $_SERVER['REMOTE_ADDR'] ?? '';
-if ($remote_addr !== '127.0.0.1' && $remote_addr !== '::1') {
+// Only allow requests that have the correct secret token
+$secret_token = 'govassist_internal_async_secret_2026';
+if (!isset($_POST['token']) || $_POST['token'] !== $secret_token) {
     exit('Forbidden');
 }
 

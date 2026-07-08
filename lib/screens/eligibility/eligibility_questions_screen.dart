@@ -62,7 +62,7 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
             padding: const EdgeInsets.symmetric(vertical: 14),
             decoration: BoxDecoration(
               color: isSelected
-                  ? activeColor.withOpacity(0.1)
+                  ? activeColor.withValues(alpha: 0.1)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
@@ -129,13 +129,9 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text('Eligibility Assessment'.tr()),
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: _isLoading ? const Center(child: CircularProgressIndicator()) 
         : _questions.isEmpty ? Center(child: Text("No questions for this service.".tr()))
@@ -148,10 +144,10 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
               vertical: 16.0,
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -171,7 +167,7 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
                       ),
                     ),
                     Text(
-                      '$answeredQuestions ' + 'of'.tr() + ' $totalQuestions',
+                      '$answeredQuestions ${'of'.tr()} $totalQuestions',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         color: Theme.of(context).primaryColor,
                         fontWeight: FontWeight.bold,
@@ -185,7 +181,7 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 8,
-                    backgroundColor: Colors.grey[200],
+                    backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey[200],
                     valueColor: AlwaysStoppedAnimation<Color>(
                       Theme.of(context).primaryColor,
                     ),
@@ -215,17 +211,17 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
                         Text(
                           'Applying for:'.tr(),
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey[600],
                             fontSize: 14,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           widget.service.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                           ),
                         ),
                       ],
@@ -258,7 +254,7 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
                               decoration: BoxDecoration(
                                 color: Theme.of(
                                   context,
-                                ).primaryColor.withOpacity(0.1),
+                                ).primaryColor.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Text(
@@ -335,10 +331,10 @@ class _EligibilityQuestionsScreenState extends State<EligibilityQuestionsScreen>
           bottom: MediaQuery.of(context).padding.bottom + 16.0,
         ),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
