@@ -5,27 +5,18 @@ require_once 'cors.php';
 require_once 'db.php';
 require_once 'auth_middleware.php';
 
-function log_profile_error($message) {
-    $logFile = __DIR__ . '/../uploads/error_log.txt';
-    // When flattened, it will be in the same folder as the script, so '../uploads' is replaced by 'uploads'
-    // in the deployment script. Thus we use relative path.
-    $logFile = '../uploads/error_log.txt';
-    $dir = dirname($logFile);
-    if (!file_exists($dir)) {
-        mkdir($dir, 0777, true);
-    }
-    file_put_contents($logFile, date('Y-m-d H:i:s') . ' - ' . $message . PHP_EOL, FILE_APPEND);
-}
-
 set_error_handler(function($errno, $errstr, $errfile, $errline) {
-    log_profile_error("PHP Error [$errno]: $errstr in $errfile on line $errline");
+    if (error_reporting() & $errno) {
+        http_response_code(500);
+        echo json_encode(['error' => "PHP Error [$errno]: $errstr in $errfile on line $errline"]);
+        exit();
+    }
     return false;
 });
 
 set_exception_handler(function($exception) {
-    log_profile_error("PHP Exception: " . $exception->getMessage() . " in " . $exception->getFile() . " on line " . $exception->getLine());
     http_response_code(500);
-    echo json_encode(['error' => 'An error occurred. Check the log.']);
+    echo json_encode(['error' => "PHP Exception: " . $exception->getMessage() . " in " . $exception->getFile() . " on line " . $exception->getLine()]);
     exit();
 });
 
