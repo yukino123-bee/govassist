@@ -63,22 +63,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
               );
             },
           ),
-          const Divider(),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text('Security'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-          ),
-          ValueListenableBuilder<bool>(
-            valueListenable: AppSettings.biometricLogin,
-            builder: (context, useBiometric, _) {
-              return SwitchListTile(
-                title: Text('Biometric Login'.tr()),
-                subtitle: Text('Use fingerprint or Face ID to login'.tr()),
-                value: useBiometric,
-                onChanged: (val) => AppSettings.setBiometricLogin(val),
-              );
-            },
-          ),
         ],
       ),
     );

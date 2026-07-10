@@ -4,11 +4,9 @@ import '../../core/theme.dart';
 import '../main_layout.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
-import 'otp_verification_screen.dart';
 import '../../data/service_data.dart';
 import '../../core/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:local_auth/local_auth.dart';
 import 'dart:convert';
 import '../../core/app_settings.dart';
 import '../../core/translations.dart';
@@ -53,10 +51,6 @@ class _LoginScreenState extends State<LoginScreen> {
       if (result['success'] == true) {
         UserSession().setUser(result['user']);
         
-        // Cache user for biometric login
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('cached_user', json.encode(result['user']));
-        
         if (mounted) {
           Navigator.pushReplacement(
             context,
@@ -64,66 +58,10 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
       } else {
-        if (result['unverified'] == true) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Please verify your email to login.'.tr())),
-          );
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OtpVerificationScreen(email: email),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result['error'] ?? 'Login failed'.tr())),
-          );
-        }
-      }
-    }
-  }
-
-  Future<void> _biometricAuth() async {
-    final prefs = await SharedPreferences.getInstance();
-    final cachedUserString = prefs.getString('cached_user');
-    
-    if (cachedUserString == null) {
-      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No saved user found. Please login with password first.'.tr())),
+          SnackBar(content: Text(result['error'] ?? 'Login failed'.tr())),
         );
       }
-      return;
-    }
-
-    try {
-      final LocalAuthentication auth = LocalAuthentication();
-      final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
-      final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
-      
-      if (!canAuthenticate) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Biometric authentication not supported on this device.'.tr())),
-          );
-        }
-        return;
-      }
-
-      final bool didAuthenticate = await auth.authenticate(
-        localizedReason: 'Please authenticate to login'.tr(),
-      );
-
-      if (didAuthenticate && mounted) {
-        final cachedUser = json.decode(cachedUserString);
-        UserSession().setUser(cachedUser);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainLayout()),
-        );
-      }
-    } catch (e) {
-      debugPrint(e.toString());
     }
   }
 
@@ -202,19 +140,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       text: 'Login'.tr(),
                       onPressed: _login,
                     ),
-              const SizedBox(height: 16),
-              ValueListenableBuilder<bool>(
-                valueListenable: AppSettings.biometricLogin,
-                builder: (context, useBiometric, _) {
-                  if (useBiometric) {
-                    return IconButton(
-                      icon: const Icon(Icons.fingerprint, size: 48, color: AppTheme.primaryColor),
-                      onPressed: _biometricAuth,
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

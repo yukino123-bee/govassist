@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../widgets/custom_widgets.dart';
 import '../../core/theme.dart';
 import '../../data/service_data.dart';
-import 'otp_verification_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -62,16 +61,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (result['success'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Registration successful! Please check your email.'),
-            duration: Duration(seconds: 5),
+            content: Text('Registration successful! You can now login.'),
+            duration: Duration(seconds: 3),
           ),
         );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OtpVerificationScreen(email: email),
-          ),
-        );
+        Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result['error'] ?? 'Registration failed')),

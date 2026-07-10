@@ -12,19 +12,13 @@ if ($method === 'POST') {
     
     if (isset($input['email']) && isset($input['password'])) {
         try {
-            $stmt = $pdo->prepare("SELECT id, full_name, email, password_hash, email_verified_at, is_admin, dob, address, civil_status, contact_number, profile_picture FROM users WHERE email = ?");
+            $stmt = $pdo->prepare("SELECT id, full_name, email, password_hash, is_admin, dob, address, civil_status, contact_number, profile_picture FROM users WHERE email = ?");
             $stmt->execute([$input['email']]);
             
             if ($stmt->rowCount() > 0) {
                 $user = $stmt->fetch();
                 
                 if (password_verify($input['password'], $user['password_hash'])) {
-                    if ($user['email_verified_at'] === null) {
-                        http_response_code(403); // Forbidden
-                        echo json_encode(['error' => 'Email not verified', 'unverified' => true]);
-                        exit();
-                    }
-                    
                     // Remove password_hash before sending back to client
                     unset($user['password_hash']);
                     

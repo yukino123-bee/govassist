@@ -23,25 +23,20 @@ if ($method === 'POST') {
 
             // Hash the password securely
             $passwordHash = password_hash($input['password'], PASSWORD_DEFAULT);
-            $verificationCode = sprintf("%06d", mt_rand(1, 999999));
+            $now = date('Y-m-d H:i:s');
             
-            $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password_hash, created_at, verification_code) VALUES (?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password_hash, created_at) VALUES (?, ?, ?, ?)");
             $stmt->execute([
                 $input['fullName'],
                 $input['email'],
                 $passwordHash,
-                date('Y-m-d H:i:s'),
-                $verificationCode
+                $now
             ]);
-            
-            // Send actual email asynchronously to avoid blocking the user
-            $emailSent = sendVerificationEmailAsync($input['email'], $verificationCode);
             
             http_response_code(200);
             echo json_encode([
                 'success' => true,
-                'message' => 'Registration successful. Please check your email for the OTP.',
-                'email_sent' => $emailSent
+                'message' => 'Registration successful.',
             ]);
         } catch (PDOException $e) {
             http_response_code(500);
