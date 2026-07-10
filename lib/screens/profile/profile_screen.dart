@@ -8,6 +8,7 @@ import '../../core/user_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/service_data.dart';
 import '../../core/translations.dart';
+import 'dart:convert';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -17,6 +18,25 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  Future<void> _refreshProfile() async {
+    final res = await ServiceData.fetchProfile();
+    if (res['success'] == true) {
+      final user = res['user'];
+      UserSession().setUser(user);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('cached_user', json.encode(user));
+      if (mounted) {
+        setState(() {});
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(res['error'] ?? 'Failed to refresh profile'.tr())),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,8 +45,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         automaticallyImplyLeading: false,
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        child: Column(
+      body: RefreshIndicator(
+        onRefresh: _refreshProfile,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
           children: [
             _buildHeader(context),
             const SizedBox(height: 24),
@@ -106,8 +129,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildHeader(BuildContext context) {
     final user = UserSession().currentUser;
