@@ -6,9 +6,6 @@ import 'register_screen.dart';
 import 'forgot_password_screen.dart';
 import '../../data/service_data.dart';
 import '../../core/user_session.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import '../../core/app_settings.dart';
 import '../../core/translations.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -32,9 +29,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
       setState(() {
         _isLoading = false;
       });
@@ -42,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     final result = await ServiceData.login(email, password);
-    
+
     setState(() {
       _isLoading = false;
     });
@@ -50,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (mounted) {
       if (result['success'] == true) {
         UserSession().setUser(result['user']);
-        
+
         if (mounted) {
           Navigator.pushReplacement(
             context,
@@ -89,7 +86,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: AppTheme.primaryColor,
                   shape: BoxShape.circle,
                 ),
-                child: Image.asset('assets/images/logo.png', width: 50, height: 50),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  width: 50,
+                  height: 50,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
@@ -127,7 +128,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const ForgotPasswordScreen(),
+                      ),
                     );
                   },
                   child: Text('Forgot Password?'.tr()),
@@ -136,10 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 24),
               _isLoading
                   ? const CircularProgressIndicator()
-                  : CustomButton(
-                      text: 'Login'.tr(),
-                      onPressed: _login,
-                    ),
+                  : CustomButton(text: 'Login'.tr(), onPressed: _login),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -152,7 +152,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterScreen(),
+                        ),
                       );
                     },
                     child: Text('Register'.tr()),
