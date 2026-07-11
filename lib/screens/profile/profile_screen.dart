@@ -159,27 +159,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, spreadRadius: 2),
               ],
             ),
-            child: CircleAvatar(
-              radius: 45,
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              backgroundImage: (() {
-                if (user?['profile_picture'] != null) {
-                  final String currentPic = user!['profile_picture'];
-                  if (currentPic.startsWith('http')) {
-                    return NetworkImage(currentPic);
-                  } else {
-                    return NetworkImage('${ServiceData.baseUrl.replaceAll('/api', '')}/$currentPic');
-                  }
-                }
-                return null;
-              })(),
-              onBackgroundImageError: (exception, stackTrace) {
-                // Do nothing, let the child icon show
-              },
-              child: user?['profile_picture'] == null
-                  ? const Icon(Icons.person, size: 50, color: Colors.grey)
-                  : null,
-            ),
+              child: ClipOval(
+                child: SizedBox(
+                  width: 90,
+                  height: 90,
+                  child: Builder(builder: (context) {
+                    final profilePic = user?['profile_picture'];
+                    if (profilePic == null) {
+                      return const Icon(Icons.person, size: 50, color: Colors.grey);
+                    }
+                    final url = profilePic.toString().startsWith('http')
+                        ? profilePic.toString()
+                        : '${ServiceData.baseUrl.replaceAll('/api', '')}/$profilePic';
+                        
+                    return Image.network(
+                      url,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(Icons.person, size: 50, color: Colors.grey);
+                      },
+                    );
+                  }),
+                ),
+              ),
           ),
           const SizedBox(height: 16),
           Text(

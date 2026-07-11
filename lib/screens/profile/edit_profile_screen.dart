@@ -185,28 +185,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 children: [
                   Builder(
                     builder: (context) {
-                      ImageProvider? imageProvider;
+                      String? currentPicUrl;
                       if (_profileAvatarUrl != null) {
-                        imageProvider = NetworkImage(_profileAvatarUrl!);
+                        currentPicUrl = _profileAvatarUrl;
                       } else if (UserSession().currentUser?['profile_picture'] != null) {
-                        final currentPic = UserSession().currentUser!['profile_picture'];
+                        final currentPic = UserSession().currentUser!['profile_picture'].toString();
                         if (currentPic.startsWith('http')) {
-                          imageProvider = NetworkImage(currentPic);
+                          currentPicUrl = currentPic;
                         } else {
-                          imageProvider = NetworkImage('${ServiceData.baseUrl.replaceAll('/api', '')}/$currentPic');
+                          currentPicUrl = '${ServiceData.baseUrl.replaceAll('/api', '')}/$currentPic';
                         }
                       }
                       
-                      return CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.grey.shade200,
-                        backgroundImage: imageProvider,
-                        onBackgroundImageError: (exception, stackTrace) {
-                          // fallback to icon
-                        },
-                        child: _profileAvatarUrl == null && UserSession().currentUser?['profile_picture'] == null
-                            ? const Icon(Icons.person, size: 50, color: Colors.grey)
-                            : null,
+                      return ClipOval(
+                        child: Container(
+                          width: 100,
+                          height: 100,
+                          color: Colors.grey.shade200,
+                          child: currentPicUrl == null
+                              ? const Icon(Icons.person, size: 50, color: Colors.grey)
+                              : Image.network(
+                                  currentPicUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(Icons.person, size: 50, color: Colors.grey);
+                                  },
+                                ),
+                        ),
                       );
                     }
                   ),
