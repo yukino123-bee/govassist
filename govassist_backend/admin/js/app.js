@@ -1540,7 +1540,16 @@ window.saveAnnouncement = async function(id) {
             body: JSON.stringify(payload)
         });
         
-        const data = await res.json();
+        const text = await res.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch(err) {
+            console.error("Server returned non-JSON:", text);
+            alert('Server error: ' + text.substring(0, 100));
+            return;
+        }
+
         if(data.success) {
             closeModalFn();
             renderAnnouncements();
@@ -1548,7 +1557,7 @@ window.saveAnnouncement = async function(id) {
             alert(data.error || 'Failed to save announcement');
         }
     } catch (e) {
-        alert('Network error');
+        alert('Network error: ' + e.message);
     }
 }
 
