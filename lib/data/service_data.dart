@@ -258,6 +258,24 @@ class ServiceData {
     return [];
   }
 
+  static Future<bool> replyToInquiry(String ticketId, String message, String status) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/admin/manage_inquiries.php'),
+        headers: _headers,
+        body: json.encode({
+          'ticket_id': ticketId,
+          'message_text': message,
+          'status': status,
+        }),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('Error replying to inquiry: $e');
+      return false;
+    }
+  }
+
   static Future<bool> sendMessage(String ticketId, String text) async {
     try {
       final response = await http.post(

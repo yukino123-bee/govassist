@@ -180,11 +180,7 @@ class _AdminInquiriesScreenState extends State<AdminInquiriesScreen> {
                                     ),
                                   ),
                                 ),
-                                onTap: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Admin viewing ticket: ${ticket.id}')),
-                                  );
-                                },
+                                onTap: () => _showReplyDialog(context, ticket),
                               ),
                             );
                           },
@@ -192,6 +188,85 @@ class _AdminInquiriesScreenState extends State<AdminInquiriesScreen> {
                 ),
         ),
       ],
+    );
+  }
+
+  void _showReplyDialog(BuildContext context, InquiryTicket ticket) {
+    final TextEditingController replyController = TextEditingController();
+    String selectedStatus = ticket.status;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              title: Text('Reply to Ticket #${ticket.id}'),
+              content: SizedBox(
+                width: 500,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Subject: ${ticket.subject}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: replyController,
+                      maxLines: 4,
+                      decoration: const InputDecoration(
+                        labelText: 'Your Reply',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedStatus,
+                      decoration: const InputDecoration(labelText: 'Change Status', border: OutlineInputBorder()),
+                      items: ['Open', 'In Progress', 'Closed'].map((s) {
+                        return DropdownMenuItem(value: s, child: Text(s));
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setStateDialog(() => selectedStatus = val);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (replyController.text.trim().isEmpty) return;
+                    Navigator.pop(context);
+                    setState(() => _isLoading = true);
+                    final success = await ServiceData.replyToInquiry(
+                      ticket.id,
+                      replyController.text.trim(),
+                      selectedStatus,
+                    );
+                    if (!mounted) return;
+                    if (success) {
+                      // ignore: use_build_context_synchronously
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reply sent successfully!')));
+                      _fetchInquiries();
+                    } else {
+                      // ignore: use_build_context_synchronously
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to send reply.')));
+                      setState(() => _isLoading = false);
+                    }
+                  },
+                  child: const Text('Send Reply & Update'),
+                ),
+              ],
+            );
+          }
+        );
+      },
     );
   }
 }

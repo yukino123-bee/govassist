@@ -73,14 +73,14 @@ if ($method === 'POST') {
             }
 
             // Also search requirements for this service
-            $reqStmt = $pdo->prepare("SELECT requirement_name FROM requirements WHERE service_id = ?");
+            $reqStmt = $pdo->prepare("SELECT name FROM requirements WHERE service_id = ?");
             $reqStmt->execute([$service['id']]);
             $requirements = $reqStmt->fetchAll();
             
             $reqListText = "";
             foreach ($requirements as $req) {
-                $reqContent = strtolower($req['requirement_name']);
-                $reqListText .= "- " . $req['requirement_name'] . "\n";
+                $reqContent = strtolower($req['name']);
+                $reqListText .= "- " . $req['name'] . "\n";
                 foreach ($filteredTokens as $token) {
                     if (strpos($reqContent, $token) !== false) {
                         $score += 1;
