@@ -238,6 +238,7 @@ class _ScannerItemCardState extends State<ScannerItemCard> with SingleTickerProv
       setState(() {
         _imagePath = image.path;
         _isScanning = true;
+        _isExpanded = true;
       });
       _scanController.forward(from: 0.0);
       
@@ -324,6 +325,15 @@ class _ScannerItemCardState extends State<ScannerItemCard> with SingleTickerProv
                     Icon(
                       _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                       color: Colors.grey,
+                    )
+                  else
+                    IconButton(
+                      icon: const Icon(Icons.camera_alt_outlined, size: 22),
+                      color: Theme.of(context).primaryColor,
+                      tooltip: 'Scan again'.tr(),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: _startScan,
                     ),
                 ],
               ),
