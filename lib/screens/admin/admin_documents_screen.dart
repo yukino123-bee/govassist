@@ -146,11 +146,7 @@ class _AdminDocumentsScreenState extends State<AdminDocumentsScreen> {
                           ),
                           DataCell(
                             TextButton(
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('View document ${doc.id}')),
-                                );
-                              },
+                              onPressed: () => _showReviewDialog(doc),
                               child: const Text('Review'),
                             ),
                           ),
@@ -164,5 +160,72 @@ class _AdminDocumentsScreenState extends State<AdminDocumentsScreen> {
           ),
       ],
     );
+  }
+
+  void _showReviewDialog(UploadedDocument doc) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Review Document: ${doc.requirementName}'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Uploader: ${doc.uploaderName}'),
+                Text('Date: ${DateFormat('MMM dd, yyyy').format(doc.uploadedAt)}'),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: InteractiveViewer(
+                    child: Image.network(
+                      '${ServiceData.baseUrl}/uploads/${doc.filePath}',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => const Text('Image not found or could not be loaded.'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                _updateStatus(doc.id, 'Rejected');
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor, foregroundColor: Colors.white),
+              child: const Text('Reject'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                _updateStatus(doc.id, 'Verified');
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.successColor, foregroundColor: Colors.white),
+              child: const Text('Approve'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _updateStatus(String docId, String status) async {
+    setState(() => _isLoading = true);
+    final result = await ServiceData.updateDocumentStatus(docId, status);
+    if (mounted) {
+      if (result['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Document status updated to $status')));
+        _loadDocuments();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error updating status: ${result['error']}')));
+        setState(() => _isLoading = false);
+      }
+    }
   }
 }

@@ -302,7 +302,7 @@ class ServiceData {
   static Future<List<UploadedDocument>> fetchAllDocuments() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/admin_get_documents.php'),
+        Uri.parse('$baseUrl/admin/manage_documents.php'),
       );
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
@@ -343,6 +343,25 @@ class ServiceData {
       return json.decode(responseData);
     } catch (e) {
       return {'status': 'error', 'message': 'Upload error: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> updateDocumentStatus(
+    String documentId,
+    String status,
+  ) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/admin/manage_documents.php'),
+        headers: _headers,
+        body: json.encode({
+          'id': documentId,
+          'status': status,
+        }),
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      return {'error': 'Network error: $e'};
     }
   }
 
