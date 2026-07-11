@@ -490,7 +490,7 @@ class ServiceData {
             headers: {'Content-Type': 'application/json'},
             body: json.encode({'email': email, 'password': password}),
           )
-          .timeout(const Duration(seconds: 20));
+          .timeout(const Duration(seconds: 60));
 
       final data = json.decode(response.body);
       if (response.statusCode == 200 && data['success'] == true) {
@@ -662,7 +662,7 @@ class ServiceData {
       }
 
       final streamedResponse = await request.send().timeout(
-        const Duration(seconds: 20),
+        const Duration(seconds: 60),
       );
       final response = await http.Response.fromStream(streamedResponse);
 
@@ -858,7 +858,7 @@ class ServiceData {
             headers: _headers,
             body: json.encode({'message': message}),
           )
-          .timeout(const Duration(seconds: 20));
+          .timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
