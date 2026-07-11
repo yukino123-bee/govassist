@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../models/service_model.dart';
 import '../models/uploaded_document_model.dart';
 import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class ServiceData {
   // Production Backend URL
