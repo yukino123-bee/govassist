@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'govassist_backend/**'
   workflow_dispatch:
 
 jobs:
@@ -16,7 +14,18 @@ jobs:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
 
-    - name: 🔨 Flatten Backend
+    - name: ⚙️ Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+
+    - name: 📦 Install Dependencies
+      run: flutter pub get
+
+    - name: 🔨 Build Flutter Web
+      run: flutter build web --release
+
+    - name: 🔨 Flatten Backend & Combine
       shell: pwsh
       run: |
         ./.github/scripts/build.ps1

@@ -1,5 +1,6 @@
 $source = "govassist_backend"
 $flatDest = "dist"
+$flutterWeb = "build/web"
 
 Write-Host "Starting Release Pipeline..." -ForegroundColor Cyan
 
@@ -7,6 +8,11 @@ Write-Host "Starting Release Pipeline..." -ForegroundColor Cyan
 Write-Host "Flattening backend to $flatDest..."
 if (Test-Path $flatDest) { Remove-Item -Path $flatDest -Recurse -Force }
 New-Item -ItemType Directory -Path $flatDest | Out-Null
+
+if (Test-Path $flutterWeb) {
+    Write-Host "Copying Flutter Web Build..." -ForegroundColor Cyan
+    Copy-Item -Path "$flutterWeb/*" -Destination $flatDest -Recurse -Force
+}
 
 Copy-Item -Path "$source/api/*.php" -Destination $flatDest -Force
 if (Test-Path "$source/vendor") { Copy-Item -Path "$source/vendor" -Destination "$flatDest/vendor" -Recurse -Force }
