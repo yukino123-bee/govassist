@@ -104,12 +104,16 @@ if ($method === 'POST') {
         // Minimum threshold to prevent random loose matches from firing
         if ($bestScore < 2 && !empty($filteredTokens)) {
             // Check for general keywords if no specific service/faq matched
-            if (in_array('how', $tokens) && (in_array('apply', $tokens) || in_array('process', $tokens))) {
+            if (in_array('how', $tokens) && (in_array('apply', $tokens) || in_array('process', $tokens) || in_array('start', $tokens))) {
                 $bestResponse = 'To apply for any program, go to the Home screen, select a specific assistance service, review the requirements, and tap "Start Eligibility Assessment" to begin.';
             } else if (in_array('who', $tokens) || in_array('qualify', $tokens) || in_array('eligible', $tokens) || in_array('eligibility', $tokens)) {
                 $bestResponse = 'Eligibility depends on the specific program. Generally, you must be a resident of the municipality. Please check the specific program\'s page for detailed applicant qualifications.';
-            } else if (in_array('requirement', $tokens) || in_array('documents', $tokens)) {
+            } else if (in_array('requirement', $tokens) || in_array('documents', $tokens) || in_array('missing', $tokens) || in_array('need', $tokens)) {
                 $bestResponse = 'Requirements vary by program. Please navigate to the specific program on the Home screen to view its complete list of required documents.';
+            } else if (in_array('status', $tokens) || in_array('pending', $tokens) || in_array('approved', $tokens) || in_array('rejected', $tokens)) {
+                $bestResponse = 'To check the status of your applications, tap on your profile and select "My Applications". Admin facilitators will process and update your application status there.';
+            } else if (in_array('help', $tokens) || in_array('assist', $tokens) || in_array('support', $tokens)) {
+                $bestResponse = 'I can help you with eligibility questions, application processes, and required documents. If you need human assistance, you can submit a formal Inquiry ticket in the "Submit Inquiry" tab.';
             }
         }
 

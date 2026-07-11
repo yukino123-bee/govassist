@@ -17,6 +17,7 @@ class _ChatInterfaceScreenState extends State<ChatInterfaceScreen> {
   
   final stt.SpeechToText _speechToText = stt.SpeechToText();
   bool _isListening = false;
+  bool _isTyping = false;
   final FlutterTts _flutterTts = FlutterTts();
 
   @override
@@ -72,14 +73,16 @@ class _ChatInterfaceScreenState extends State<ChatInterfaceScreen> {
           timestamp: DateTime.now(),
         ),
       );
+      _isTyping = true;
     });
     _messageController.clear();
 
-    // Show typing indicator (optional, but good UX) by delaying slightly, but here we just wait for API
+    // Fetch API
     final botResponse = await ServiceData.sendGovBotQuery(userMessage);
 
     if (mounted) {
       setState(() {
+        _isTyping = false;
         _messages.add(
           InquiryMessage(
             id: DateTime.now().toString(),
@@ -156,6 +159,24 @@ class _ChatInterfaceScreenState extends State<ChatInterfaceScreen> {
               },
             ),
           ),
+          if (_isTyping)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).primaryColor),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('GovBot is typing...', style: TextStyle(color: Colors.grey, fontSize: 12, fontStyle: FontStyle.italic)),
+                  ],
+                ),
+              ),
+            ),
           Container(
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
@@ -171,11 +192,19 @@ class _ChatInterfaceScreenState extends State<ChatInterfaceScreen> {
             ),
             child: Row(
               children: [
-                CircleAvatar(
-                  backgroundColor: _isListening ? Colors.red.shade100 : Colors.grey.shade200,
-                  child: IconButton(
-                    icon: Icon(_isListening ? Icons.mic : Icons.mic_none, color: _isListening ? Colors.red : Theme.of(context).primaryColor, size: 20),
-                    onPressed: _listen,
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  padding: EdgeInsets.all(_isListening ? 4.0 : 0.0),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _isListening ? Colors.red.withValues(alpha: 0.2) : Colors.transparent,
+                  ),
+                  child: CircleAvatar(
+                    backgroundColor: _isListening ? Colors.red.shade100 : Colors.grey.shade200,
+                    child: IconButton(
+                      icon: Icon(_isListening ? Icons.mic : Icons.mic_none, color: _isListening ? Colors.red : Theme.of(context).primaryColor, size: 20),
+                      onPressed: _listen,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),

@@ -624,6 +624,38 @@ class ServiceData {
     }
   }
 
+  // ADMIN APPLICATION ENDPOINTS
+  static Future<Map<String, dynamic>> fetchAdminApplications() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin/manage_applications.php'),
+        headers: _headers,
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      }
+      return {'error': 'Failed to load applications'};
+    } catch (e) {
+      return {'error': 'Network error'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> updateApplicationStatus(String applicationId, String status) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/admin/manage_applications.php'),
+        headers: _headers,
+        body: json.encode({
+          'application_id': applicationId,
+          'status': status,
+        }),
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      return {'error': 'Network error'};
+    }
+  }
+
   // GOVBOT API
   static Future<String> sendGovBotQuery(String message) async {
     try {

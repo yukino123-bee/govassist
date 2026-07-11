@@ -39,6 +39,12 @@ class AdminSidebar extends StatelessWidget {
                   onTap: () => onNavigate('Services'),
                 ),
                 _SidebarItem(
+                  icon: Icons.assignment,
+                  title: 'Applications',
+                  isSelected: currentRoute == 'Applications',
+                  onTap: () => onNavigate('Applications'),
+                ),
+                _SidebarItem(
                   icon: Icons.description_outlined,
                   title: 'Requirements',
                   isSelected: currentRoute == 'Requirements',

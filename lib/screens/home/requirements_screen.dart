@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../models/service_model.dart';
 import '../../widgets/custom_widgets.dart';
 import '../../core/translations.dart';
+import '../../core/user_session.dart';
+import '../../data/service_data.dart';
 
 class RequirementsScreen extends StatefulWidget {
   final GovernmentService service;
@@ -25,13 +27,20 @@ class _RequirementsScreenState extends State<RequirementsScreen> {
     _fetchRequirements();
   }
 
-  void _fetchRequirements() {
+  void _fetchRequirements() async {
     final reqs = widget.service.requirements;
+    final user = UserSession().currentUser;
+    List<String> uploadedReqs = [];
+    if (user != null) {
+      final docs = await ServiceData.fetchUploadedDocuments(user['id'].toString());
+      final serviceDocs = docs.where((d) => d.serviceId == widget.service.id.toString()).toList();
+      uploadedReqs = serviceDocs.map((d) => d.requirementName).toList();
+    }
     if (mounted) {
       setState(() {
         _requirements = reqs;
         for (var req in _requirements) {
-          _checklistStatus[req.id] = false;
+          _checklistStatus[req.id] = uploadedReqs.contains(req.name);
         }
         _isLoading = false;
       });
@@ -112,17 +121,40 @@ class _RequirementsScreenState extends State<RequirementsScreen> {
                   return ScannerItemCard(
                     requirement: req.name,
                     isVerified: isChecked,
-                    onVerified: () {
-                      setState(() {
-                        _checklistStatus[req.id] = true;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Document successfully scanned and verified!'.tr()),
-                          backgroundColor: Colors.green,
-                          duration: Duration(seconds: 2),
-                        ),
+                    onVerified: (File imageFile) async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final user = UserSession().currentUser;
+                      if (user == null) return false;
+                      
+                      final res = await ServiceData.uploadDocument(
+                        user['id'].toString(),
+                        widget.service.id.toString(),
+                        req.name,
+                        imageFile
                       );
+                      
+                      if (res['success'] == true || res['status'] == 'success') {
+                        setState(() {
+                          _checklistStatus[req.id] = true;
+                        });
+                        if (mounted) {
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text('Document successfully scanned and uploaded!'.tr()),
+                              backgroundColor: Colors.green,
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                        return true;
+                      } else {
+                        if (mounted) {
+                          messenger.showSnackBar(
+                            SnackBar(content: Text(res['error'] ?? 'Upload failed')),
+                          );
+                        }
+                        return false;
+                      }
                     },
                   );
                 },
@@ -158,7 +190,7 @@ class _RequirementsScreenState extends State<RequirementsScreen> {
 class ScannerItemCard extends StatefulWidget {
   final String requirement;
   final bool isVerified;
-  final VoidCallback onVerified;
+  final Future<bool> Function(File) onVerified;
 
   const ScannerItemCard({
     super.key,
@@ -187,11 +219,7 @@ class _ScannerItemCardState extends State<ScannerItemCard> with SingleTickerProv
     );
     _scanController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        setState(() {
-          _isScanning = false;
-          _isExpanded = false;
-        });
-        widget.onVerified();
+        // Handled in _startScan
       }
     });
   }
@@ -212,11 +240,28 @@ class _ScannerItemCardState extends State<ScannerItemCard> with SingleTickerProv
         _isScanning = true;
       });
       _scanController.forward(from: 0.0);
+      
+      final success = await widget.onVerified(File(image.path));
+      
+      if (mounted) {
+        setState(() {
+          _isScanning = false;
+          if (success) {
+             _isExpanded = false;
+          } else {
+             _imagePath = null; // Reset if upload failed
+          }
+        });
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to open camera: '.tr() + e.toString())),
         );
+        setState(() {
+          _isScanning = false;
+          _imagePath = null;
+        });
       }
     }
   }
