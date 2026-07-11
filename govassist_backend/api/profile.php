@@ -60,7 +60,7 @@ if ($method === 'GET') {
         // Handle profile picture upload
         if (isset($_FILES['profile_picture'])) {
             if ($_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = '../uploads/profiles/';
+                $uploadDir = __DIR__ . '/../uploads/profiles/';
                 if (!file_exists($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
                 }
@@ -71,40 +71,36 @@ if ($method === 'GET') {
                     $profile_picture_path = 'uploads/profiles/' . $fileName;
                 } else {
                     http_response_code(500);
-                    echo json_encode(['error' => 'Failed to move uploaded profile picture. Check server permissions.']);
+                    echo json_encode(['error' => 'Failed to save profile picture on server']);
                     exit();
                 }
-            } else {
+            } else if ($_FILES['profile_picture']['error'] !== UPLOAD_ERR_NO_FILE) {
                 http_response_code(400);
-                echo json_encode(['error' => 'Profile picture upload error code: ' . $_FILES['profile_picture']['error']]);
+                echo json_encode(['error' => 'Profile picture upload error: ' . $_FILES['profile_picture']['error']]);
                 exit();
             }
         }
         
-        // Handle file upload
+        // Handle file upload for valid_id
         if (isset($_FILES['valid_id'])) {
             if ($_FILES['valid_id']['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = '../uploads/ids/';
-                
-                // Create dir if not exists (fallback)
+                $uploadDir = __DIR__ . '/../uploads/ids/';
                 if (!file_exists($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
                 }
-                
                 $fileExtension = pathinfo($_FILES['valid_id']['name'], PATHINFO_EXTENSION);
                 $fileName = 'user_' . $user_id . '_' . time() . '.' . $fileExtension;
                 $destination = $uploadDir . $fileName;
-                
                 if (move_uploaded_file($_FILES['valid_id']['tmp_name'], $destination)) {
                     $valid_id_path = 'uploads/ids/' . $fileName;
                 } else {
                     http_response_code(500);
-                    echo json_encode(['error' => 'Failed to move uploaded valid ID. Check server permissions.']);
+                    echo json_encode(['error' => 'Failed to save valid ID on server']);
                     exit();
                 }
-            } else {
+            } else if ($_FILES['valid_id']['error'] !== UPLOAD_ERR_NO_FILE) {
                 http_response_code(400);
-                echo json_encode(['error' => 'Valid ID upload error code: ' . $_FILES['valid_id']['error']]);
+                echo json_encode(['error' => 'Valid ID upload error: ' . $_FILES['valid_id']['error']]);
                 exit();
             }
         }
