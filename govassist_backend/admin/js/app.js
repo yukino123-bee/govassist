@@ -77,6 +77,9 @@ async function loadView(view) {
     } else if (view === 'templates') {
         if(pageTitle) pageTitle.textContent = 'Document Templates';
         await renderTemplates();
+    } else if (view === 'announcements') {
+        if(pageTitle) pageTitle.textContent = 'Manage Announcements';
+        await renderAnnouncements();
     } else if (view === 'settings') {
         if(pageTitle) pageTitle.textContent = 'System Settings';
         await renderSettings();
@@ -1426,6 +1429,126 @@ async function updateDocStatus(id, status) {
     // Visual update will happen automatically if they change the dropdown, 
     // but we can re-render to ensure badge colors update
     renderDocuments();
+}
+
+// ==========================================
+// Announcements Module
+// ==========================================
+async function renderAnnouncements() {
+    mainContent.innerHTML = `
+        <div class="header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2>Announcements</h2>
+            <button class="btn btn-primary" onclick="showAnnouncementModal()">+ Create Announcement</button>
+        </div>
+        <div class="glass-panel" style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Content</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="announcementsTableBody">
+                    <tr><td colspan="5" style="text-align: center;">Loading announcements...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    try {
+        const res = await fetch('../api/admin/manage_announcements.php');
+        const data = await res.json();
+        
+        const tbody = document.getElementById('announcementsTableBody');
+        
+        if (data.success && data.announcements.length > 0) {
+            tbody.innerHTML = data.announcements.map(a => `
+                <tr>
+                    <td>${a.id}</td>
+                    <td style="font-weight: 600;">${escapeHTML(a.title)}</td>
+                    <td>${escapeHTML(a.content).substring(0, 50)}${a.content.length > 50 ? '...' : ''}</td>
+                    <td>${new Date(a.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="showAnnouncementModal(${a.id}, '${escapeHTML(a.title).replace(/'/g, "\\'")}', '${escapeHTML(a.content).replace(/'/g, "\\'")}')">Edit</button>
+                        <button class="btn" style="background: var(--danger); color: white;" onclick="deleteAnnouncement(${a.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No announcements found.</td></tr>';
+        }
+    } catch (e) {
+        document.getElementById('announcementsTableBody').innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Failed to load announcements.</td></tr>';
+    }
+}
+
+window.showAnnouncementModal = function(id = null, title = '', content = '') {
+    modalTitle.textContent = id ? 'Edit Announcement' : 'Create Announcement';
+    modalBody.innerHTML = `
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="annTitle" class="form-control" value="${title}" required>
+        </div>
+        <div class="form-group">
+            <label>Content</label>
+            <textarea id="annContent" class="form-control" rows="5" required>${content}</textarea>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.5rem;">
+            <button class="btn btn-secondary" onclick="closeModalFn()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveAnnouncement(${id || 'null'})">Save</button>
+        </div>
+    `;
+    modalOverlay.classList.add('active');
+}
+
+window.saveAnnouncement = async function(id) {
+    const title = document.getElementById('annTitle').value.trim();
+    const content = document.getElementById('annContent').value.trim();
+    
+    if(!title || !content) {
+        alert('Title and content are required');
+        return;
+    }
+    
+    const method = id ? 'PUT' : 'POST';
+    const payload = id ? { id, title, content } : { title, content };
+    
+    try {
+        const res = await fetch('../api/admin/manage_announcements.php', {
+            method: method,
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await res.json();
+        if(data.success) {
+            closeModalFn();
+            renderAnnouncements();
+        } else {
+            alert(data.error || 'Failed to save announcement');
+        }
+    } catch (e) {
+        alert('Network error');
+    }
+}
+
+window.deleteAnnouncement = async function(id) {
+    if(!confirm('Are you sure you want to delete this announcement?')) return;
+    
+    try {
+        const res = await fetch(\`../api/admin/manage_announcements.php?id=\${id}\`, { method: 'DELETE' });
+        const data = await res.json();
+        if(data.success) {
+            renderAnnouncements();
+        } else {
+            alert(data.error || 'Failed to delete announcement');
+        }
+    } catch (e) {
+        alert('Network error');
+    }
 }
 
 // Initialize
