@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/custom_widgets.dart';
 import '../../core/user_session.dart';
-import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';

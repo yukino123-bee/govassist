@@ -6,6 +6,7 @@ import 'admin_applications_screen.dart';
 import 'admin_services_screen.dart';
 import 'admin_document_templates_screen.dart';
 import 'admin_announcements_screen.dart';
+import 'admin_assessments_screen.dart';
 import '../../data/service_data.dart';
 import '../../models/service_model.dart';
 import 'package:intl/intl.dart';

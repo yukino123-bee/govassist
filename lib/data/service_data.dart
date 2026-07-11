@@ -8,8 +8,8 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class ServiceData {
-  // Production Backend URL
-  static const String baseUrl = 'http://govassist.atwebpages.com';
+  // Local Backend URL for Development
+  static const String baseUrl = 'http://localhost/govassist_backend/api';
 
   static String? _token;
 
@@ -23,7 +23,7 @@ class ServiceData {
 
   static Future<List<Announcement>> fetchAnnouncements() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/api/announcements.php'));
+      final response = await http.get(Uri.parse('$baseUrl/announcements.php'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
@@ -42,7 +42,7 @@ class ServiceData {
   static Future<List<Announcement>> fetchAdminAnnouncements() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/api/admin/manage_announcements.php'),
+        Uri.parse('$baseUrl/admin/manage_announcements.php'),
         headers: _headers,
       );
       if (response.statusCode == 200) {
@@ -63,7 +63,7 @@ class ServiceData {
   static Future<Map<String, dynamic>> createAnnouncement(String title, String content) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/api/admin/manage_announcements.php'),
+        Uri.parse('$baseUrl/admin/manage_announcements.php'),
         headers: _headers,
         body: json.encode({'title': title, 'content': content}),
       );
@@ -77,7 +77,7 @@ class ServiceData {
   static Future<Map<String, dynamic>> updateAnnouncement(int id, String title, String content) async {
     try {
       final response = await http.put(
-        Uri.parse('$baseUrl/api/admin/manage_announcements.php'),
+        Uri.parse('$baseUrl/admin/manage_announcements.php'),
         headers: _headers,
         body: json.encode({'id': id, 'title': title, 'content': content}),
       );
@@ -91,7 +91,7 @@ class ServiceData {
   static Future<Map<String, dynamic>> deleteAnnouncement(int id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$baseUrl/api/admin/manage_announcements.php?id=$id'),
+        Uri.parse('$baseUrl/admin/manage_announcements.php?id=$id'),
         headers: _headers,
       );
       return json.decode(response.body);
