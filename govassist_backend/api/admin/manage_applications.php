@@ -10,7 +10,7 @@ if ($method === 'GET') {
     try {
         $stmt = $pdo->prepare("
             SELECT a.id, a.user_id, a.service_id, a.status, a.submitted_at, a.updated_at,
-                   u.first_name, u.last_name, u.email,
+                   u.full_name, u.email,
                    s.title as service_title
             FROM applications a
             JOIN users u ON a.user_id = u.id

@@ -121,7 +121,7 @@ class _AdminApplicationsScreenState extends State<AdminApplicationsScreen> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        Text('Applicant: ${app['first_name']} ${app['last_name']} (${app['email']})'),
+                        Text('Applicant: ${app['full_name'] ?? 'Unknown'} (${app['email']})'),
                         Text('Submitted: ${DateFormat('MMM dd, yyyy').format(date)}'),
                         const SizedBox(height: 16),
                         Row(
