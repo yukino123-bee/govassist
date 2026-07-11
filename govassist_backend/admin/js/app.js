@@ -1469,7 +1469,11 @@ async function renderAnnouncements() {
     `;
 
     try {
-        const res = await fetch('../api/admin/manage_announcements.php');
+        const res = await fetch('../api/admin/manage_announcements.php', {
+            headers: {
+                'Authorization': 'Bearer ' + sessionStorage.getItem('govassist_token')
+            }
+        });
         const data = await res.json();
         
         const tbody = document.getElementById('announcementsTableBody');
@@ -1529,7 +1533,10 @@ window.saveAnnouncement = async function(id) {
     try {
         const res = await fetch('../api/admin/manage_announcements.php', {
             method: method,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem('govassist_token')
+            },
             body: JSON.stringify(payload)
         });
         
@@ -1549,7 +1556,12 @@ window.deleteAnnouncement = async function(id) {
     if(!confirm('Are you sure you want to delete this announcement?')) return;
     
     try {
-        const res = await fetch(`../api/admin/manage_announcements.php?id=${id}`, { method: 'DELETE' });
+        const res = await fetch(`../api/admin/manage_announcements.php?id=${id}`, { 
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + sessionStorage.getItem('govassist_token')
+            }
+        });
         const data = await res.json();
         if(data.success) {
             renderAnnouncements();
