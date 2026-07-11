@@ -164,7 +164,7 @@ class ServiceData {
     return [];
   }
 
-  static Future<bool> saveAssessment(
+  static Future<Map<String, dynamic>> saveAssessment(
     String serviceTitle,
     bool isEligible,
   ) async {
@@ -178,10 +178,10 @@ class ServiceData {
           'date': DateTime.now().toIso8601String(),
         }),
       );
-      return response.statusCode == 200;
+      return json.decode(response.body);
     } catch (e) {
       debugPrint('Error saving assessment: $e');
-      return false;
+      return {'error': 'Network error'};
     }
   }
 
@@ -693,6 +693,21 @@ class ServiceData {
       return json.decode(respStr);
     } catch (e) {
       return {'error': 'Network error: $e'};
+    }
+  }
+
+  static Future<List<dynamic>> adminFetchAssessments() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin/manage_assessments.php'),
+        headers: _headers,
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      }
+      return [];
+    } catch (e) {
+      return [];
     }
   }
 

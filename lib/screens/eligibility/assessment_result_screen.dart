@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../models/service_model.dart';
 import '../../widgets/custom_widgets.dart';
 import '../../data/service_data.dart';
-import 'dart:math';
 
 class AssessmentResultScreen extends StatefulWidget {
   final GovernmentService service;
@@ -15,17 +14,27 @@ class AssessmentResultScreen extends StatefulWidget {
 }
 
 class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
-  late String refNumber;
+  String refNumber = '';
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    refNumber = 'REF-${Random().nextInt(9000) + 1000}';
     _saveResult();
   }
 
   Future<void> _saveResult() async {
-    await ServiceData.saveAssessment(widget.service.title, widget.isEligible);
+    final result = await ServiceData.saveAssessment(widget.service.title, widget.isEligible);
+    if (mounted) {
+      setState(() {
+        if (result['success'] == true) {
+          refNumber = result['reference_number'] ?? 'REF-UNKNOWN';
+        } else {
+          refNumber = 'ERROR-SAVING';
+        }
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -34,7 +43,9 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
       appBar: AppBar(
         title: const Text('Assessment Result'),
       ),
-      body: Center(
+      body: _isLoading 
+        ? const Center(child: CircularProgressIndicator())
+        : Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(

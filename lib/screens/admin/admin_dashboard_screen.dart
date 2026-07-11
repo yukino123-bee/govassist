@@ -4,6 +4,7 @@ import 'admin_sidebar.dart';
 import 'admin_documents_screen.dart';
 import 'admin_applications_screen.dart';
 import 'admin_services_screen.dart';
+import 'admin_assessments_screen.dart';
 import '../../data/service_data.dart';
 import '../../models/service_model.dart';
 import 'package:intl/intl.dart';
@@ -86,6 +87,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         return const AdminApplicationsScreen();
       case 'Services':
         return const AdminServicesScreen();
+      case 'Assessments':
+      case 'Eligibility':
+        return const AdminAssessmentsScreen();
       case 'Documents':
         return const AdminDocumentsScreen();
       case 'Dashboard':
