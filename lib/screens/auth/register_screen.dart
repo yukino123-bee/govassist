@@ -86,96 +86,134 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 16),
-              Container(
-                width: 80,
-                height: 80,
-                decoration: const BoxDecoration(
-                  color: AppTheme.primaryColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  width: 40,
-                  height: 40,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'GovAssist',
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  color: AppTheme.primaryColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Create your account',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 32),
-              CustomTextField(
-                controller: _fullNameController,
-                label: 'Full Name',
-                hint: 'e.g. John Doe',
-                prefixIcon: Icons.person_outline,
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                controller: _emailController,
-                label: 'Email',
-                hint: 'Enter your email address',
-                prefixIcon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                controller: _passwordController,
-                label: 'Password',
-                hint: 'Create a strong password',
-                prefixIcon: Icons.lock_outline,
-                isPassword: true,
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                controller: _confirmPasswordController,
-                label: 'Confirm Password',
-                hint: 'Repeat your password',
-                prefixIcon: Icons.lock_outline,
-                isPassword: true,
-              ),
-              const SizedBox(height: 32),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : CustomButton(text: 'Register', onPressed: _register),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Already have an account?',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Login'),
-                  ),
-                ],
-              ),
-            ],
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppTheme.primaryColor.withValues(alpha: 0.05),
+                AppTheme.secondaryColor.withValues(alpha: 0.1),
+              ],
+            ),
           ),
-        ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 450),
+              child: Card(
+                elevation: 8,
+                shadowColor: AppTheme.primaryColor.withValues(alpha: 0.2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                margin: const EdgeInsets.all(24),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 16),
+                      Container(
+                        width: 70,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.primaryColor.withValues(alpha: 0.2),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(10),
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        'GovAssist',
+                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                          color: AppTheme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 28,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Create your account',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      CustomTextField(
+                        controller: _fullNameController,
+                        label: 'Full Name',
+                        hint: 'e.g. John Doe',
+                        prefixIcon: Icons.person_outline,
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                        controller: _emailController,
+                        label: 'Email',
+                        hint: 'Enter your email address',
+                        prefixIcon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                        controller: _passwordController,
+                        label: 'Password',
+                        hint: 'Enter your password',
+                        prefixIcon: Icons.lock_outline,
+                        isPassword: true,
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                        controller: _confirmPasswordController,
+                        label: 'Confirm Password',
+                        hint: 'Re-enter your password',
+                        prefixIcon: Icons.lock_outline,
+                        isPassword: true,
+                      ),
+                      const SizedBox(height: 32),
+                      _isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : CustomButton(
+                              text: 'Create Account',
+                              onPressed: _register,
+                              isFullWidth: true,
+                            ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Already have an account?',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppTheme.primaryColor,
+                            ),
+                            child: const Text('Login', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ),
