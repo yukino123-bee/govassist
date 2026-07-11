@@ -3,6 +3,7 @@ import '../../widgets/custom_widgets.dart';
 import '../../core/user_session.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/service_data.dart';
 
@@ -22,6 +23,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _civilStatusController;
   late TextEditingController _contactController;
   XFile? _idImage;
+  XFile? _profileImageFile;
   String? _profileAvatarUrl;
   bool _isLoading = false;
 
@@ -81,6 +83,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     (index) => 'https://api.dicebear.com/9.x/adventurer/png?seed=GovAssistUser${index + 1}',
   );
 
+  Future<void> _pickProfileImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 35,
+      maxWidth: 600,
+      maxHeight: 600,
+    );
+    if (pickedFile != null) {
+      setState(() {
+        _profileImageFile = pickedFile;
+        _profileAvatarUrl = null; // clear avatar if custom image picked
+      });
+      if (!mounted) return;
+      Navigator.pop(context); // close bottom sheet
+    }
+  }
+
   void _showAvatarPicker() {
     showModalBottomSheet(
       context: context,
@@ -118,6 +138,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   },
                 ),
               ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _pickProfileImage,
+                  icon: const Icon(Icons.upload_file),
+                  label: const Text('Upload Custom Image'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
             ],
           ),
         );
@@ -142,6 +174,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       contactNumber: _contactController.text.trim(),
       idImage: _idImage,
       profilePicture: _profileAvatarUrl,
+      profilePictureFile: _profileImageFile,
     );
 
     setState(() => _isLoading = false);
@@ -185,6 +218,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 children: [
                   Builder(
                     builder: (context) {
+                      if (_profileImageFile != null) {
+                        return FutureBuilder<Uint8List>(
+                          future: _profileImageFile!.readAsBytes(),
+                          builder: (context, snapshot) {
+                            return ClipOval(
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                color: Colors.grey.shade200,
+                                child: snapshot.hasData
+                                    ? Image.memory(snapshot.data!, fit: BoxFit.cover)
+                                    : const Icon(Icons.person, size: 50, color: Colors.grey),
+                              ),
+                            );
+                          }
+                        );
+                      }
+                      
                       String? currentPicUrl;
                       if (_profileAvatarUrl != null) {
                         currentPicUrl = _profileAvatarUrl;

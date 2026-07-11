@@ -608,6 +608,7 @@ class ServiceData {
     String? contactNumber,
     XFile? idImage,
     String? profilePicture,
+    XFile? profilePictureFile,
   }) async {
     try {
       var request = http.MultipartRequest(
@@ -648,7 +649,15 @@ class ServiceData {
         );
       }
 
-      if (profilePicture != null) {
+      if (profilePictureFile != null) {
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'profile_picture',
+            await profilePictureFile.readAsBytes(),
+            filename: profilePictureFile.name,
+          ),
+        );
+      } else if (profilePicture != null) {
         request.fields['profile_picture'] = profilePicture;
       }
 
