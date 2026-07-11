@@ -656,6 +656,46 @@ class ServiceData {
     }
   }
 
+  // ADMIN SERVICE MANAGEMENT API
+  static Future<Map<String, dynamic>> adminCreateService(Map<String, dynamic> payload) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/admin/manage_services.php'),
+        headers: _headers,
+        body: json.encode(payload),
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      return {'error': 'Network error: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> adminUpdateService(Map<String, dynamic> payload) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/admin/manage_services.php'),
+        headers: _headers,
+        body: json.encode(payload),
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      return {'error': 'Network error: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> adminDeleteService(String serviceId) async {
+    try {
+      final request = http.Request('DELETE', Uri.parse('$baseUrl/admin/manage_services.php'));
+      request.headers.addAll(_headers);
+      request.body = json.encode({'id': serviceId});
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      return json.decode(respStr);
+    } catch (e) {
+      return {'error': 'Network error: $e'};
+    }
+  }
+
   // GOVBOT API
   static Future<String> sendGovBotQuery(String message) async {
     try {

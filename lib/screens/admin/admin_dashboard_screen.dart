@@ -3,6 +3,7 @@ import '../../core/user_session.dart';
 import 'admin_sidebar.dart';
 import 'admin_documents_screen.dart';
 import 'admin_applications_screen.dart';
+import 'admin_services_screen.dart';
 import '../../data/service_data.dart';
 import '../../models/service_model.dart';
 import 'package:intl/intl.dart';
@@ -83,6 +84,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     switch (_currentRoute) {
       case 'Applications':
         return const AdminApplicationsScreen();
+      case 'Services':
+        return const AdminServicesScreen();
       case 'Documents':
         return const AdminDocumentsScreen();
       case 'Dashboard':

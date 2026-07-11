@@ -22,15 +22,26 @@ if ($method === 'GET') {
         http_response_code(500);
         echo json_encode(['error' => $e->getMessage()]);
     }
-} elseif ($method === 'POST') {
-    // Add a new service
-    $input = json_decode(file_get_contents('php://input'), true);
-    if (isset($input['title'], $input['description'])) {
-        try {
-            $pdo->beginTransaction();
+    exit;
+}
 
+// We expect a JSON payload for POST, PUT, DELETE
+$input = json_decode(file_get_contents('php://input'), true);
+
+if (!$input) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Invalid JSON input']);
+    exit;
+}
+
+try {
+    $pdo->beginTransaction();
+    
+    if ($method === 'POST') {
+        // Add a new service
+        if (isset($input['title'], $input['description'])) {
             $id = 'srv_' . uniqid();
-            $categoryId = 'cat_1'; // Hardcoded fallback category
+            $categoryId = $input['categoryId'] ?? 'cat_1';
 
             $stmt = $pdo->prepare("
                 INSERT INTO services (id, category_id, title, titleLocal, description, descriptionLocal, procedures, proceduresLocal) 
@@ -47,18 +58,40 @@ if ($method === 'GET') {
                 $input['proceduresLocal'] ?? ''
             ]);
             
-            if (!empty($input['requirements'])) {
-                $reqs = explode("\n", str_replace("\r", "", $input['requirements']));
-                $reqStmt = $pdo->prepare("
-                    INSERT INTO requirements (id, service_id, name, is_required) 
-                    VALUES (?, ?, ?, 1)
-                ");
-                
-                foreach ($reqs as $req) {
-                    $req = trim($req);
-                    if (!empty($req)) {
+            // Insert requirements (as array of objects)
+            if (isset($input['requirements']) && is_array($input['requirements'])) {
+                $reqStmt = $pdo->prepare("INSERT INTO requirements (id, service_id, name, is_required) VALUES (?, ?, ?, ?)");
+                foreach ($input['requirements'] as $req) {
+                    $reqName = trim($req['name'] ?? '');
+                    if (!empty($reqName)) {
                         $reqId = 'req_' . uniqid();
-                        $reqStmt->execute([$reqId, $id, $req]);
+                        $reqStmt->execute([
+                            $reqId, 
+                            $id, 
+                            $reqName,
+                            isset($req['isRequired']) ? (int)$req['isRequired'] : 1
+                        ]);
+                    }
+                }
+            }
+
+            // Insert eligibility questions
+            if (isset($input['eligibilityQuestions']) && is_array($input['eligibilityQuestions'])) {
+                $eqStmt = $pdo->prepare("INSERT INTO eligibility_questions (id, service_id, question_text, expected_answer, options) VALUES (?, ?, ?, ?, ?)");
+                foreach ($input['eligibilityQuestions'] as $eq) {
+                    $qText = trim($eq['questionText'] ?? '');
+                    if (!empty($qText)) {
+                        $optionsJson = null;
+                        if (isset($eq['options']) && is_array($eq['options']) && !empty($eq['options'])) {
+                            $optionsJson = json_encode($eq['options']);
+                        }
+                        $eqStmt->execute([
+                            'eq_' . uniqid(),
+                            $id,
+                            $qText,
+                            $eq['expectedAnswer'] ?? '1',
+                            $optionsJson
+                        ]);
                     }
                 }
             }
@@ -66,51 +99,67 @@ if ($method === 'GET') {
             $pdo->commit();
             http_response_code(200);
             echo json_encode(['success' => true, 'id' => $id]);
-        } catch (PDOException $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-            http_response_code(500);
-            echo json_encode(['error' => $e->getMessage()]);
+        } else {
+            throw new Exception('Missing title or description');
         }
-    } else {
-        http_response_code(400);
-        echo json_encode(['error' => 'Invalid input']);
-    }
-} elseif ($method === 'PUT') {
-    // Update a service
-    $input = json_decode(file_get_contents('php://input'), true);
-    if (isset($input['id'], $input['title'], $input['description'])) {
-        try {
-            $pdo->beginTransaction();
+
+    } elseif ($method === 'PUT') {
+        // Update a service
+        if (isset($input['id'], $input['title'], $input['description'])) {
+            $serviceId = $input['id'];
 
             $stmt = $pdo->prepare("
                 UPDATE services 
-                SET title = ?, description = ?
-                WHERE id = ?
+                SET category_id=?, title=?, titleLocal=?, description=?, descriptionLocal=?, procedures=?, proceduresLocal=?
+                WHERE id=?
             ");
             $stmt->execute([
+                $input['categoryId'] ?? 'cat_1',
                 $input['title'],
+                $input['titleLocal'] ?? '',
                 $input['description'],
-                $input['id']
+                $input['descriptionLocal'] ?? '',
+                $input['procedures'] ?? '',
+                $input['proceduresLocal'] ?? '',
+                $serviceId
             ]);
             
             // Replace requirements
-            $delStmt = $pdo->prepare("DELETE FROM requirements WHERE service_id = ?");
-            $delStmt->execute([$input['id']]);
-
-            if (!empty($input['requirements'])) {
-                $reqs = explode("\n", str_replace("\r", "", $input['requirements']));
-                $reqStmt = $pdo->prepare("
-                    INSERT INTO requirements (id, service_id, name, is_required) 
-                    VALUES (?, ?, ?, 1)
-                ");
-                
-                foreach ($reqs as $req) {
-                    $req = trim($req);
-                    if (!empty($req)) {
+            $pdo->prepare("DELETE FROM requirements WHERE service_id=?")->execute([$serviceId]);
+            if (isset($input['requirements']) && is_array($input['requirements'])) {
+                $reqStmt = $pdo->prepare("INSERT INTO requirements (id, service_id, name, is_required) VALUES (?, ?, ?, ?)");
+                foreach ($input['requirements'] as $req) {
+                    $reqName = trim($req['name'] ?? '');
+                    if (!empty($reqName)) {
                         $reqId = 'req_' . uniqid();
-                        $reqStmt->execute([$reqId, $input['id'], $req]);
+                        $reqStmt->execute([
+                            $reqId, 
+                            $serviceId, 
+                            $reqName,
+                            isset($req['isRequired']) ? (int)$req['isRequired'] : 1
+                        ]);
+                    }
+                }
+            }
+
+            // Replace eligibility questions
+            $pdo->prepare("DELETE FROM eligibility_questions WHERE service_id=?")->execute([$serviceId]);
+            if (isset($input['eligibilityQuestions']) && is_array($input['eligibilityQuestions'])) {
+                $eqStmt = $pdo->prepare("INSERT INTO eligibility_questions (id, service_id, question_text, expected_answer, options) VALUES (?, ?, ?, ?, ?)");
+                foreach ($input['eligibilityQuestions'] as $eq) {
+                    $qText = trim($eq['questionText'] ?? '');
+                    if (!empty($qText)) {
+                        $optionsJson = null;
+                        if (isset($eq['options']) && is_array($eq['options']) && !empty($eq['options'])) {
+                            $optionsJson = json_encode($eq['options']);
+                        }
+                        $eqStmt->execute([
+                            'eq_' . uniqid(),
+                            $serviceId,
+                            $qText,
+                            $eq['expectedAnswer'] ?? '1',
+                            $optionsJson
+                        ]);
                     }
                 }
             }
@@ -118,34 +167,38 @@ if ($method === 'GET') {
             $pdo->commit();
             http_response_code(200);
             echo json_encode(['success' => true]);
-        } catch (PDOException $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-            http_response_code(500);
-            echo json_encode(['error' => $e->getMessage()]);
+        } else {
+            throw new Exception('Missing id, title or description');
         }
-    } else {
-        http_response_code(400);
-        echo json_encode(['error' => 'Invalid input']);
-    }
-} elseif ($method === 'DELETE') {
-    // Delete a service
-    $input = json_decode(file_get_contents('php://input'), true);
-    if (isset($input['id'])) {
-        try {
-            $stmt = $pdo->prepare("DELETE FROM services WHERE id = ?");
-            $stmt->execute([$input['id']]);
+
+    } elseif ($method === 'DELETE') {
+        // Delete a service
+        if (isset($input['id'])) {
+            $serviceId = $input['id'];
             
+            // Delete child dependencies first
+            $pdo->prepare("DELETE FROM requirements WHERE service_id=?")->execute([$serviceId]);
+            $pdo->prepare("DELETE FROM eligibility_questions WHERE service_id=?")->execute([$serviceId]);
+            
+            // Delete service
+            $stmt = $pdo->prepare("DELETE FROM services WHERE id=?");
+            $stmt->execute([$serviceId]);
+            
+            $pdo->commit();
             http_response_code(200);
             echo json_encode(['success' => true]);
-        } catch (PDOException $e) {
-            http_response_code(500);
-            echo json_encode(['error' => $e->getMessage()]);
+        } else {
+            throw new Exception('Missing id');
         }
     } else {
-        http_response_code(400);
-        echo json_encode(['error' => 'Invalid input']);
+        throw new Exception('Method not allowed');
     }
+
+} catch (Exception $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    http_response_code(500);
+    echo json_encode(['error' => $e->getMessage()]);
 }
 ?>
