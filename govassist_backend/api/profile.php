@@ -60,7 +60,7 @@ if ($method === 'GET') {
         // Handle profile picture upload
         if (isset($_FILES['profile_picture'])) {
             if ($_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = __DIR__ . '/../uploads/profiles/';
+                $uploadDir = '../uploads/profiles/';
                 if (!file_exists($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
                 }
@@ -84,7 +84,7 @@ if ($method === 'GET') {
         // Handle file upload for valid_id
         if (isset($_FILES['valid_id'])) {
             if ($_FILES['valid_id']['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = __DIR__ . '/../uploads/ids/';
+                $uploadDir = '../uploads/ids/';
                 if (!file_exists($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
                 }

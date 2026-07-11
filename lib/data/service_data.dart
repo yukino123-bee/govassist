@@ -9,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 
 class ServiceData {
   // Production Backend URL
-  static const String baseUrl = 'http://govassist.atwebpages.com/api';
+  static const String baseUrl = 'http://govassist.atwebpages.com';
 
   static String? _token;
 
