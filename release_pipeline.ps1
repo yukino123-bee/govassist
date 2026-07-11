@@ -35,7 +35,7 @@ foreach ($file in $phpFiles) {
                         -replace "'\.\./db\.php'", "'db.php'" `
                         -replace "'\.\./auth_middleware\.php'", "'auth_middleware.php'" `
                         -replace "'\.\./jwt\.php'", "'jwt.php'" `
-                        -replace "'\.\./uploads/", "'uploads/" `
+                        -replace "'/\.\./uploads/", "'/uploads/" `
                         -replace "'/\.\./vendor/autoload\.php'", "'/vendor/autoload.php'"
     $content | Set-Content $file.FullName
 }
