@@ -22,20 +22,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _addressController;
   late TextEditingController _civilStatusController;
   late TextEditingController _contactController;
-  File? _idImage;
-  File? _profileImage;
+  XFile? _idImage;
+  XFile? _profileImage;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _dobController = TextEditingController();
+    _addressController = TextEditingController();
+    _civilStatusController = TextEditingController();
+    _contactController = TextEditingController();
+    _loadCurrentProfile();
+  }
+
+  void _loadCurrentProfile() {
     final user = UserSession().currentUser;
-    _nameController = TextEditingController(text: user?['full_name'] ?? '');
-    _emailController = TextEditingController(text: user?['email'] ?? '');
-    _dobController = TextEditingController(text: user?['dob'] ?? '');
-    _addressController = TextEditingController(text: user?['address'] ?? '');
-    _civilStatusController = TextEditingController(text: user?['civil_status'] ?? '');
-    _contactController = TextEditingController(text: user?['contact_number'] ?? '');
+    if (user != null) {
+      _nameController.text = user['full_name'] ?? '';
+      _emailController.text = user['email'] ?? '';
+      _dobController.text = user['dob'] ?? '';
+      _addressController.text = user['address'] ?? '';
+      _civilStatusController.text = user['civil_status'] ?? '';
+      _contactController.text = user['contact_number'] ?? '';
+    }
   }
 
   @override
@@ -60,7 +72,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
     if (pickedFile != null) {
       setState(() {
-        _idImage = File(pickedFile.path);
+        _idImage = pickedFile;
       });
     }
   }
@@ -75,7 +87,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
     if (pickedFile != null) {
       setState(() {
-        _profileImage = File(pickedFile.path);
+        _profileImage = pickedFile;
       });
     }
   }
@@ -138,20 +150,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               onTap: _pickProfileImage,
               child: Stack(
                 children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.grey.shade200,
-                    backgroundImage: _profileImage != null
-                        ? FileImage(_profileImage!)
-                        : (UserSession().currentUser?['profile_picture'] != null
-                            ? NetworkImage('${ServiceData.baseUrl.replaceAll('/api', '')}/${UserSession().currentUser!['profile_picture']}')
-                            : null) as ImageProvider?,
-                    onBackgroundImageError: (exception, stackTrace) {
-                      // fallback to icon
-                    },
-                    child: _profileImage == null && UserSession().currentUser?['profile_picture'] == null
-                        ? const Icon(Icons.person, size: 50, color: Colors.grey)
-                        : null,
+                  FutureBuilder<Uint8List>(
+                    future: _profileImage?.readAsBytes(),
+                    builder: (context, snapshot) {
+                      ImageProvider? imageProvider;
+                      if (_profileImage != null && snapshot.hasData) {
+                        imageProvider = MemoryImage(snapshot.data!);
+                      } else if (UserSession().currentUser?['profile_picture'] != null) {
+                        imageProvider = NetworkImage('${ServiceData.baseUrl.replaceAll('/api', '')}/${UserSession().currentUser!['profile_picture']}');
+                      }
+                      
+                      return CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.grey.shade200,
+                        backgroundImage: imageProvider,
+                        onBackgroundImageError: (exception, stackTrace) {
+                          // fallback to icon
+                        },
+                        child: _profileImage == null && UserSession().currentUser?['profile_picture'] == null
+                            ? const Icon(Icons.person, size: 50, color: Colors.grey)
+                            : null,
+                      );
+                    }
                   ),
                   Positioned(
                     bottom: 0,

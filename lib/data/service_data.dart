@@ -524,9 +524,8 @@ class ServiceData {
     String? address,
     String? civilStatus,
     String? contactNumber,
-    dynamic
-    idImage, // Can be File or XFile depending on platform, usually dart:io File
-    dynamic profilePicture,
+    XFile? idImage,
+    XFile? profilePicture,
   }) async {
     try {
       var request = http.MultipartRequest(
@@ -559,15 +558,20 @@ class ServiceData {
 
       if (idImage != null) {
         request.files.add(
-          await http.MultipartFile.fromPath('valid_id', idImage.path),
+          http.MultipartFile.fromBytes(
+            'valid_id',
+            await idImage.readAsBytes(),
+            filename: idImage.name,
+          ),
         );
       }
 
       if (profilePicture != null) {
         request.files.add(
-          await http.MultipartFile.fromPath(
+          http.MultipartFile.fromBytes(
             'profile_picture',
-            profilePicture.path,
+            await profilePicture.readAsBytes(),
+            filename: profilePicture.name,
           ),
         );
       }
