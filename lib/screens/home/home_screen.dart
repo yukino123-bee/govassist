@@ -8,6 +8,8 @@ import 'service_detail_screen.dart';
 import '../../core/user_session.dart';
 import '../services/application_tracking_screen.dart';
 import '../../core/translations.dart';
+import '../../models/announcement_model.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<GovernmentService> _services = [];
   List<dynamic> _applications = [];
+  List<Announcement> _announcements = [];
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -47,13 +50,15 @@ class _HomeScreenState extends State<HomeScreen> {
     final servicesFuture = ServiceData.fetchServices(query: _searchQuery, forceRefresh: forceRefresh);
     final notifsFuture = userId != null ? ServiceData.fetchNotifications(userId) : Future.value({});
     final appsFuture = userId != null ? ServiceData.fetchApplications(userId) : Future.value({});
+    final announcementsFuture = ServiceData.fetchAnnouncements();
 
     // Wait for all futures simultaneously to dramatically speed up loading
-    final results = await Future.wait([servicesFuture, notifsFuture, appsFuture]);
+    final results = await Future.wait([servicesFuture, notifsFuture, appsFuture, announcementsFuture]);
     
     final services = results[0] as List<GovernmentService>;
     final notifs = results[1] as Map<String, dynamic>;
     final appsData = results[2] as Map<String, dynamic>;
+    final announcements = results[3] as List<Announcement>;
 
     int unread = 0;
     List<dynamic> applications = [];
@@ -69,9 +74,19 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _services = services;
         _applications = applications;
+        _announcements = announcements;
         _unreadCount = unread;
         _isLoading = false;
       });
+    }
+  }
+
+  String _formatDate(String dateString) {
+    try {
+      final date = DateTime.parse(dateString);
+      return DateFormat('MMM d, yyyy').format(date);
+    } catch (e) {
+      return dateString;
     }
   }
 
@@ -296,36 +311,79 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                     const SizedBox(height: 32),
 
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3)),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.campaign, color: Theme.of(context).colorScheme.secondary, size: 32),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
+                    if (_announcements.isEmpty)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.campaign, color: Theme.of(context).colorScheme.secondary, size: 32),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Provincial Announcement'.tr(),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Stay updated on the latest government programs.'.tr(),
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Column(
+                        children: _announcements.map((announcement) {
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3)),
+                            ),
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Provincial Announcement'.tr(),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Stay updated on the latest government programs.'.tr(),
-                                  style: const TextStyle(fontSize: 12),
+                                Icon(Icons.campaign, color: Theme.of(context).colorScheme.secondary, size: 32),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        announcement.title,
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, fontSize: 16),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        announcement.content,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        _formatDate(announcement.createdAt),
+                                        style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
+                          );
+                        }).toList(),
                       ),
-                    ),
                     const SizedBox(height: 32),
 
                     SectionHeader(title: 'All Services'.tr()),

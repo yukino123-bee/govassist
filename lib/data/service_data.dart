@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/service_model.dart';
 import '../models/uploaded_document_model.dart';
+import '../models/announcement_model.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
@@ -18,6 +19,86 @@ class ServiceData {
       headers['Authorization'] = 'Bearer $_token';
     }
     return headers;
+  }
+
+  static Future<List<Announcement>> fetchAnnouncements() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/api/announcements.php'));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          return (data['announcements'] as List)
+              .map((a) => Announcement.fromJson(a))
+              .toList();
+        }
+      }
+      return [];
+    } catch (e) {
+      debugPrint('Error fetching announcements: $e');
+      return [];
+    }
+  }
+
+  static Future<List<Announcement>> fetchAdminAnnouncements() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/admin/manage_announcements.php'),
+        headers: _headers,
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          return (data['announcements'] as List)
+              .map((a) => Announcement.fromJson(a))
+              .toList();
+        }
+      }
+      return [];
+    } catch (e) {
+      debugPrint('Error fetching admin announcements: $e');
+      return [];
+    }
+  }
+
+  static Future<Map<String, dynamic>> createAnnouncement(String title, String content) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/admin/manage_announcements.php'),
+        headers: _headers,
+        body: json.encode({'title': title, 'content': content}),
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('Error creating announcement: $e');
+      return {'error': 'Network error'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> updateAnnouncement(int id, String title, String content) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/api/admin/manage_announcements.php'),
+        headers: _headers,
+        body: json.encode({'id': id, 'title': title, 'content': content}),
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('Error updating announcement: $e');
+      return {'error': 'Network error'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> deleteAnnouncement(int id) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/api/admin/manage_announcements.php?id=$id'),
+        headers: _headers,
+      );
+      return json.decode(response.body);
+    } catch (e) {
+      debugPrint('Error deleting announcement: $e');
+      return {'error': 'Network error'};
+    }
   }
 
   static Future<List<ServiceCategory>> fetchCategories() async {

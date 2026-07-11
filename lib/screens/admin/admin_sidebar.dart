@@ -80,6 +80,12 @@ class AdminSidebar extends StatelessWidget {
                   isSelected: currentRoute == 'Document Templates',
                   onTap: () => onNavigate('Document Templates'),
                 ),
+                _SidebarItem(
+                  icon: Icons.campaign,
+                  title: 'Announcements',
+                  isSelected: currentRoute == 'Announcements',
+                  onTap: () => onNavigate('Announcements'),
+                ),
               ],
             ),
           ),
