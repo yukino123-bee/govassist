@@ -146,6 +146,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         : (UserSession().currentUser?['profile_picture'] != null
                             ? NetworkImage('${ServiceData.baseUrl.replaceAll('/api', '')}/${UserSession().currentUser!['profile_picture']}')
                             : null) as ImageProvider?,
+                    onBackgroundImageError: (exception, stackTrace) {
+                      // fallback to icon
+                    },
                     child: _profileImage == null && UserSession().currentUser?['profile_picture'] == null
                         ? const Icon(Icons.person, size: 50, color: Colors.grey)
                         : null,

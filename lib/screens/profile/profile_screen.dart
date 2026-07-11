@@ -165,6 +165,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               backgroundImage: user?['profile_picture'] != null
                   ? NetworkImage('${ServiceData.baseUrl.replaceAll('/api', '')}/${user!['profile_picture']}')
                   : null,
+              onBackgroundImageError: (exception, stackTrace) {
+                // Do nothing, let the child icon show
+              },
               child: user?['profile_picture'] == null
                   ? const Icon(Icons.person, size: 50, color: Colors.grey)
                   : null,
