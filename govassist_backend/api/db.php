@@ -1,10 +1,10 @@
 <?php
 // backend/api/db.php
 
-$host = 'localhost';
-$dbname = 'govassist_db';
-$username = 'root';
-$password = '';
+$host = 'fdb1032.awardspace.net';
+$dbname = '4715301_govassist';
+$username = '4715301_govassist';
+$password = 'manok123#';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
