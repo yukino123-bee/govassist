@@ -10,10 +10,13 @@ class ForgotPasswordScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Reset Password'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Forgot Password?',
@@ -42,6 +45,8 @@ class ForgotPasswordScreen extends StatelessWidget {
               },
             ),
           ],
+        ),
+      ),
         ),
       ),
     );
