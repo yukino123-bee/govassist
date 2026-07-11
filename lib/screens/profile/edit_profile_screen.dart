@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/service_data.dart';
-import 'dart:typed_data';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -23,7 +22,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _civilStatusController;
   late TextEditingController _contactController;
   XFile? _idImage;
-  XFile? _profileImage;
+  String? _profileAvatarUrl;
   bool _isLoading = false;
 
   @override
@@ -77,19 +76,53 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  Future<void> _pickProfileImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 35,
-      maxWidth: 600,
-      maxHeight: 600,
+  final List<String> _avatars = List.generate(
+    10,
+    (index) => 'https://api.dicebear.com/9.x/adventurer/png?seed=GovAssistUser${index + 1}',
+  );
+
+  void _showAvatarPicker() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Choose an Avatar', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 16),
+              Expanded(
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 5,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemCount: _avatars.length,
+                  itemBuilder: (context, index) {
+                    final avatarUrl = _avatars[index];
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() => _profileAvatarUrl = avatarUrl);
+                        Navigator.pop(context);
+                      },
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(avatarUrl),
+                        backgroundColor: Colors.grey.shade200,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
-    if (pickedFile != null) {
-      setState(() {
-        _profileImage = pickedFile;
-      });
-    }
   }
 
   void _updateProfile() async {
@@ -108,7 +141,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       civilStatus: _civilStatusController.text.trim(),
       contactNumber: _contactController.text.trim(),
       idImage: _idImage,
-      profilePicture: _profileImage,
+      profilePicture: _profileAvatarUrl,
     );
 
     setState(() => _isLoading = false);
@@ -147,17 +180,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: [
             const SizedBox(height: 16),
             GestureDetector(
-              onTap: _pickProfileImage,
+              onTap: _showAvatarPicker,
               child: Stack(
                 children: [
-                  FutureBuilder<Uint8List>(
-                    future: _profileImage?.readAsBytes(),
-                    builder: (context, snapshot) {
+                  Builder(
+                    builder: (context) {
                       ImageProvider? imageProvider;
-                      if (_profileImage != null && snapshot.hasData) {
-                        imageProvider = MemoryImage(snapshot.data!);
+                      if (_profileAvatarUrl != null) {
+                        imageProvider = NetworkImage(_profileAvatarUrl!);
                       } else if (UserSession().currentUser?['profile_picture'] != null) {
-                        imageProvider = NetworkImage('${ServiceData.baseUrl.replaceAll('/api', '')}/${UserSession().currentUser!['profile_picture']}');
+                        final currentPic = UserSession().currentUser!['profile_picture'];
+                        if (currentPic.startsWith('http')) {
+                          imageProvider = NetworkImage(currentPic);
+                        } else {
+                          imageProvider = NetworkImage('${ServiceData.baseUrl.replaceAll('/api', '')}/$currentPic');
+                        }
                       }
                       
                       return CircleAvatar(
@@ -167,7 +204,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         onBackgroundImageError: (exception, stackTrace) {
                           // fallback to icon
                         },
-                        child: _profileImage == null && UserSession().currentUser?['profile_picture'] == null
+                        child: _profileAvatarUrl == null && UserSession().currentUser?['profile_picture'] == null
                             ? const Icon(Icons.person, size: 50, color: Colors.grey)
                             : null,
                       );
@@ -182,7 +219,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: Colors.redAccent,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                      child: const Icon(Icons.edit, color: Colors.white, size: 20),
                     ),
                   ),
                 ],

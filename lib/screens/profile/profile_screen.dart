@@ -162,9 +162,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: CircleAvatar(
               radius: 45,
               backgroundColor: Theme.of(context).colorScheme.surface,
-              backgroundImage: user?['profile_picture'] != null
-                  ? NetworkImage('${ServiceData.baseUrl.replaceAll('/api', '')}/${user!['profile_picture']}')
-                  : null,
+              backgroundImage: (() {
+                if (user?['profile_picture'] != null) {
+                  final String currentPic = user!['profile_picture'];
+                  if (currentPic.startsWith('http')) {
+                    return NetworkImage(currentPic);
+                  } else {
+                    return NetworkImage('${ServiceData.baseUrl.replaceAll('/api', '')}/$currentPic');
+                  }
+                }
+                return null;
+              })(),
               onBackgroundImageError: (exception, stackTrace) {
                 // Do nothing, let the child icon show
               },

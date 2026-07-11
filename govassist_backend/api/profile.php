@@ -55,31 +55,7 @@ if ($method === 'GET') {
         $contact_number = $_POST['contact_number'] ?? null;
         
         $valid_id_path = null;
-        $profile_picture_path = null;
-        
-        // Handle profile picture upload
-        if (isset($_FILES['profile_picture'])) {
-            if ($_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = '../uploads/profiles/';
-                if (!file_exists($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-                $fileExtension = pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
-                $fileName = 'profile_' . $user_id . '_' . time() . '.' . $fileExtension;
-                $destination = $uploadDir . $fileName;
-                if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $destination)) {
-                    $profile_picture_path = 'uploads/profiles/' . $fileName;
-                } else {
-                    http_response_code(500);
-                    echo json_encode(['error' => 'Failed to save profile picture on server']);
-                    exit();
-                }
-            } else if ($_FILES['profile_picture']['error'] !== UPLOAD_ERR_NO_FILE) {
-                http_response_code(400);
-                echo json_encode(['error' => 'Profile picture upload error: ' . $_FILES['profile_picture']['error']]);
-                exit();
-            }
-        }
+        $profile_picture_path = $_POST['profile_picture'] ?? null;
         
         // Handle file upload for valid_id
         if (isset($_FILES['valid_id'])) {

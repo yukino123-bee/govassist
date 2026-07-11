@@ -607,7 +607,7 @@ class ServiceData {
     String? civilStatus,
     String? contactNumber,
     XFile? idImage,
-    XFile? profilePicture,
+    String? profilePicture,
   }) async {
     try {
       var request = http.MultipartRequest(
@@ -649,13 +649,7 @@ class ServiceData {
       }
 
       if (profilePicture != null) {
-        request.files.add(
-          http.MultipartFile.fromBytes(
-            'profile_picture',
-            await profilePicture.readAsBytes(),
-            filename: profilePicture.name,
-          ),
-        );
+        request.fields['profile_picture'] = profilePicture;
       }
 
       final streamedResponse = await request.send().timeout(
