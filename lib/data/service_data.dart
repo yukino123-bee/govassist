@@ -274,6 +274,39 @@ class ServiceData {
     }
   }
 
+  static Future<bool> submitFeedback(int rating, String comments) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/submit_feedback.php'),
+        headers: _headers,
+        body: json.encode({
+          'rating': rating,
+          'comments': comments,
+          // user_id would be here if authenticated, but keeping it optional
+        }),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('Error submitting feedback: $e');
+      return false;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> fetchAnalytics() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin/analytics.php'),
+        headers: _headers,
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      }
+    } catch (e) {
+      debugPrint('Error fetching analytics: $e');
+    }
+    return null;
+  }
+
   // DOCUMENT UPLOADS
 
   static Future<List<UploadedDocument>> fetchUploadedDocuments(

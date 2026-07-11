@@ -8,6 +8,7 @@ import 'admin_assessments_screen.dart';
 import '../../data/service_data.dart';
 import '../../models/service_model.dart';
 import 'package:intl/intl.dart';
+import 'admin_analytics_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -17,7 +18,7 @@ class AdminDashboardScreen extends StatefulWidget {
 }
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
-  String _currentRoute = 'Documents';
+  String _currentRoute = 'Dashboard';
 
   void _logout() {
     UserSession().clearSession();
@@ -93,6 +94,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       case 'Documents':
         return const AdminDocumentsScreen();
       case 'Dashboard':
+        return const AdminAnalyticsScreen();
       case 'Inquiries':
         return const AdminInquiriesScreen(); // Keeping the old inquiries logic in a separated widget
       default:

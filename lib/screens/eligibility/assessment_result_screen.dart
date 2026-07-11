@@ -87,6 +87,22 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
                   ),
                 ),
               const SizedBox(height: 32),
+              const Divider(),
+              const SizedBox(height: 16),
+              const Text('Rate your experience', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) {
+                  return IconButton(
+                    icon: Icon(Icons.star_border, color: Colors.orange, size: 32),
+                    onPressed: () {
+                      _showFeedbackDialog(context, index + 1);
+                    },
+                  );
+                }),
+              ),
+              const SizedBox(height: 16),
               CustomButton(
                 text: 'Back to Eligibility Home',
                 onPressed: () {
@@ -97,6 +113,49 @@ class _AssessmentResultScreenState extends State<AssessmentResultScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showFeedbackDialog(BuildContext context, int rating) {
+    final TextEditingController commentsController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Thank you!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('You rated us $rating stars.'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: commentsController,
+                decoration: const InputDecoration(
+                  labelText: 'Optional comments',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Skip'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                await ServiceData.submitFeedback(rating, commentsController.text.trim());
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Feedback submitted!')));
+                }
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
