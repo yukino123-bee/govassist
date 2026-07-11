@@ -57,12 +57,6 @@ class AdminSidebar extends StatelessWidget {
                   onTap: () => onNavigate('Eligibility'),
                 ),
                 _SidebarItem(
-                  icon: Icons.help_outline,
-                  title: 'FAQs',
-                  isSelected: currentRoute == 'FAQs',
-                  onTap: () => onNavigate('FAQs'),
-                ),
-                _SidebarItem(
                   icon: Icons.chat_bubble_outline,
                   title: 'Inquiries',
                   isSelected: currentRoute == 'Inquiries',

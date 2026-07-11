@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../models/service_model.dart';
-import '../../data/service_data.dart';
 import 'package:intl/intl.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_tts/flutter_tts.dart';
@@ -30,12 +29,9 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
     ),
   ];
 
-  List<FaqItem> _faqs = [];
-
   @override
   void initState() {
     super.initState();
-    _loadFaqs();
     _initTts();
   }
 
@@ -87,14 +83,7 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
     }
   }
 
-  Future<void> _loadFaqs() async {
-    final faqs = await ServiceData.fetchFaqs();
-    if (mounted) {
-      setState(() {
-        _faqs = faqs;
-      });
-    }
-  }
+
 
   void _sendMessage([String? predefinedMessage]) {
     final userMessage = predefinedMessage ?? _messageController.text.trim();
@@ -150,12 +139,7 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
   }
 
   String _generateBotResponse(String input) {
-    // Check FAQs first for an exact match
-    for (var faq in _faqs) {
-      if (input.toLowerCase().trim() == faq.question.toLowerCase().trim()) {
-        return faq.answer;
-      }
-    }
+
 
     final text = input.toLowerCase();
 
@@ -327,43 +311,7 @@ class _InquiryHomeScreenState extends State<InquiryHomeScreen> {
               },
             ),
           ),
-          // FAQ Suggestion Chips
-          if (_messages.length <= 3) // Show when chat is relatively new
-            Container(
-              height: 48,
-              padding: const EdgeInsets.only(left: 8.0),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _faqs.length,
-                itemBuilder: (context, index) {
-                  final faq = _faqs[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(
-                      right: 8.0,
-                      top: 4.0,
-                      bottom: 8.0,
-                    ),
-                    child: ActionChip(
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      side: BorderSide(
-                        color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
-                      ),
-                      label: Text(
-                        faq.question,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onPressed: () {
-                        _sendMessage(faq.question);
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
+
           Container(
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(

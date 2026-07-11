@@ -117,27 +117,6 @@ class ServiceData {
     }
   }
 
-  static Future<List<FaqItem>> fetchFaqs() async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/faqs.php'),
-        headers: _headers,
-      );
-      if (response.statusCode == 200) {
-        List jsonResponse = json.decode(response.body);
-        return jsonResponse
-            .map(
-              (data) =>
-                  FaqItem(question: data['question'], answer: data['answer']),
-            )
-            .toList();
-      }
-    } catch (e) {
-      debugPrint('Error fetching FAQs: $e');
-    }
-    return [];
-  }
-
   static Future<List<AssessmentHistory>> fetchAssessments() async {
     try {
       final response = await http.get(

@@ -34,27 +34,6 @@ if ($method === 'POST') {
         $bestScore = 0;
         $bestResponse = "I am an automated assistant. For specific inquiries not covered here, please submit a formal inquiry using the 'Submit Inquiry' button.";
 
-        // 1. Search FAQs
-        $stmt = $pdo->query("SELECT question, answer FROM faqs");
-        $faqs = $stmt->fetchAll();
-
-        foreach ($faqs as $faq) {
-            $score = 0;
-            $content = strtolower($faq['question'] . ' ' . $faq['answer']);
-            foreach ($filteredTokens as $token) {
-                if (strpos($content, $token) !== false) {
-                    $score += 1;
-                    // Boost score if it matches the question closely
-                    if (strpos(strtolower($faq['question']), $token) !== false) {
-                        $score += 2; 
-                    }
-                }
-            }
-            if ($score > $bestScore) {
-                $bestScore = $score;
-                $bestResponse = $faq['answer'];
-            }
-        }
 
         // 2. Search Services
         $stmt = $pdo->query("SELECT id, title, titleLocal, description FROM services");
