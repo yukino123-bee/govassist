@@ -8,8 +8,8 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class ServiceData {
-  // Local Backend URL for Development
-  static const String baseUrl = 'http://localhost/govassist_backend/api';
+  // Production Backend URL
+  static const String baseUrl = 'http://govassist.atwebpages.com';
 
   static String? _token;
 
