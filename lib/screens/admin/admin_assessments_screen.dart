@@ -41,10 +41,9 @@ class _AdminAssessmentsScreenState extends State<AdminAssessmentsScreen> {
       } else {
         _filteredAssessments = _assessments.where((item) {
           final title = item['service_title']?.toString().toLowerCase() ?? '';
-          final name = '${item['first_name']} ${item['last_name']}'.toLowerCase();
           final ref = item['reference_number']?.toString().toLowerCase() ?? '';
           final lowerQuery = query.toLowerCase();
-          return title.contains(lowerQuery) || name.contains(lowerQuery) || ref.contains(lowerQuery);
+          return title.contains(lowerQuery) || ref.contains(lowerQuery);
         }).toList();
       }
     });
@@ -79,7 +78,7 @@ class _AdminAssessmentsScreenState extends State<AdminAssessmentsScreen> {
           TextField(
             onChanged: _filterAssessments,
             decoration: InputDecoration(
-              hintText: 'Search by citizen name, service, or reference number...',
+              hintText: 'Search by service or reference number...',
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: Colors.white,
@@ -127,7 +126,7 @@ class _AdminAssessmentsScreenState extends State<AdminAssessmentsScreen> {
                                 ),
                               ),
                               title: Text(
-                                '${item['first_name'] ?? 'Unknown'} ${item['last_name'] ?? 'User'}',
+                                'Assessment Record',
                                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                               ),
                               subtitle: Column(

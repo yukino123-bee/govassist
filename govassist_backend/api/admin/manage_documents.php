@@ -12,7 +12,7 @@ if ($method === 'GET') {
             FROM uploaded_documents d
             LEFT JOIN users u ON d.user_id = u.id
             LEFT JOIN services s ON d.service_id = s.id
-            ORDER BY d.upload_date DESC
+            ORDER BY d.uploaded_at DESC
         ");
         $documents = $stmt->fetchAll();
         

@@ -14,13 +14,8 @@ if ($method === 'GET') {
                 a.service_title, 
                 a.date, 
                 a.is_eligible, 
-                a.reference_number,
-                u.id as user_id,
-                u.first_name,
-                u.last_name,
-                u.email
+                a.reference_number
             FROM assessments a
-            LEFT JOIN users u ON a.user_id = u.id
             ORDER BY a.date DESC
         ");
         $assessments = $stmt->fetchAll();
