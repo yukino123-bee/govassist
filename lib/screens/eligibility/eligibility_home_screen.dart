@@ -24,13 +24,20 @@ class _EligibilityHomeScreenState extends State<EligibilityHomeScreen> {
     _fetchData();
   }
 
-  Future<void> _fetchData() async {
-    final services = await ServiceData.fetchServices();
-    final history = await ServiceData.fetchAssessments();
+  Future<void> _fetchData({bool forceRefresh = false}) async {
+    if (mounted && (_services.isEmpty || _history.isEmpty)) {
+      setState(() => _isLoading = true);
+    }
+
+    final servicesFuture = ServiceData.fetchServices(forceRefresh: forceRefresh);
+    final historyFuture = ServiceData.fetchAssessments(forceRefresh: forceRefresh);
+
+    final results = await Future.wait([servicesFuture, historyFuture]);
+
     if (mounted) {
       setState(() {
-        _services = services;
-        _history = history;
+        _services = results[0] as List<GovernmentService>;
+        _history = results[1] as List<AssessmentHistory>;
         _isLoading = false;
       });
     }
@@ -46,7 +53,7 @@ class _EligibilityHomeScreenState extends State<EligibilityHomeScreen> {
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator())
         : RefreshIndicator(
-            onRefresh: _fetchData,
+            onRefresh: () => _fetchData(forceRefresh: true),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(16.0),

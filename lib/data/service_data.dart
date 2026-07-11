@@ -30,15 +30,22 @@ class ServiceData {
     return headers;
   }
 
-  static Future<List<Announcement>> fetchAnnouncements() async {
+  static List<Announcement>? _cachedAnnouncements;
+
+  static Future<List<Announcement>> fetchAnnouncements({bool forceRefresh = false}) async {
+    if (!forceRefresh && _cachedAnnouncements != null) {
+      return _cachedAnnouncements!;
+    }
     try {
       final response = await http.get(Uri.parse('$baseUrl/announcements.php'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true) {
-          return (data['announcements'] as List)
+          final parsed = (data['announcements'] as List)
               .map((a) => Announcement.fromJson(a))
               .toList();
+          _cachedAnnouncements = parsed;
+          return parsed;
         }
       }
       return [];
@@ -208,7 +215,12 @@ class ServiceData {
     }
   }
 
-  static Future<List<AssessmentHistory>> fetchAssessments() async {
+  static List<AssessmentHistory>? _cachedAssessments;
+
+  static Future<List<AssessmentHistory>> fetchAssessments({bool forceRefresh = false}) async {
+    if (!forceRefresh && _cachedAssessments != null) {
+      return _cachedAssessments!;
+    }
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/assessments.php'),
@@ -216,7 +228,7 @@ class ServiceData {
       );
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
-        return jsonResponse
+        final parsed = jsonResponse
             .map(
               (data) => AssessmentHistory(
                 id: data['id'].toString(),
@@ -227,6 +239,8 @@ class ServiceData {
               ),
             )
             .toList();
+        _cachedAssessments = parsed;
+        return parsed;
       }
     } catch (e) {
       debugPrint('Error fetching assessments: $e');
@@ -692,14 +706,21 @@ class ServiceData {
     }
   }
 
-  static Future<Map<String, dynamic>> fetchNotifications(String userId) async {
+  static Map<String, dynamic>? _cachedNotifications;
+
+  static Future<Map<String, dynamic>> fetchNotifications(String userId, {bool forceRefresh = false}) async {
+    if (!forceRefresh && _cachedNotifications != null) {
+      return _cachedNotifications!;
+    }
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/notifications.php?user_id=$userId'),
         headers: _headers,
       );
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final parsed = json.decode(response.body);
+        _cachedNotifications = parsed;
+        return parsed;
       }
       return {'error': 'Failed to fetch notifications'};
     } catch (e) {
@@ -758,14 +779,21 @@ class ServiceData {
     }
   }
 
-  static Future<Map<String, dynamic>> fetchApplications(String userId) async {
+  static Map<String, dynamic>? _cachedApplications;
+
+  static Future<Map<String, dynamic>> fetchApplications(String userId, {bool forceRefresh = false}) async {
+    if (!forceRefresh && _cachedApplications != null) {
+      return _cachedApplications!;
+    }
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/applications.php?user_id=$userId'),
         headers: _headers,
       );
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final parsed = json.decode(response.body);
+        _cachedApplications = parsed;
+        return parsed;
       }
       return {'error': 'Failed to load applications'};
     } catch (e) {
