@@ -29,18 +29,28 @@ if ($method === 'POST') {
             
             // Profile Picture Logic
             $profile_picture = null;
-            if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = '../../uploads/profiles/';
-                if (!file_exists($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-                
-                $fileExtension = pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
-                $fileName = 'profile_' . $id . '_' . time() . '.' . $fileExtension;
-                $destination = $uploadDir . $fileName;
-                
-                if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $destination)) {
-                    $profile_picture = 'uploads/profiles/' . $fileName;
+            if (isset($_FILES['profile_picture'])) {
+                if ($_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = '../../uploads/profiles/';
+                    if (!file_exists($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+                    
+                    $fileExtension = pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
+                    $fileName = 'profile_' . $id . '_' . time() . '.' . $fileExtension;
+                    $destination = $uploadDir . $fileName;
+                    
+                    if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $destination)) {
+                        $profile_picture = 'uploads/profiles/' . $fileName;
+                    } else {
+                        http_response_code(500);
+                        echo json_encode(['error' => 'Failed to move uploaded profile picture. Check server permissions.']);
+                        exit();
+                    }
+                } else {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Profile picture upload error code: ' . $_FILES['profile_picture']['error']]);
+                    exit();
                 }
             }
             
