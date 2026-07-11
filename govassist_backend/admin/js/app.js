@@ -21,6 +21,16 @@ if (adminUser && userNameDisplay && userAvatar) {
     }
 }
 
+function escapeHTML(str) {
+    if (!str) return '';
+    return str.toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 // Navigation
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', (e) => {
@@ -1539,7 +1549,7 @@ window.deleteAnnouncement = async function(id) {
     if(!confirm('Are you sure you want to delete this announcement?')) return;
     
     try {
-        const res = await fetch(\`../api/admin/manage_announcements.php?id=\${id}\`, { method: 'DELETE' });
+        const res = await fetch(`../api/admin/manage_announcements.php?id=${id}`, { method: 'DELETE' });
         const data = await res.json();
         if(data.success) {
             renderAnnouncements();
