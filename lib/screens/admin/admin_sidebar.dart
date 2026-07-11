@@ -45,28 +45,10 @@ class AdminSidebar extends StatelessWidget {
                   onTap: () => onNavigate('Applications'),
                 ),
                 _SidebarItem(
-                  icon: Icons.description_outlined,
-                  title: 'Requirements',
-                  isSelected: currentRoute == 'Requirements',
-                  onTap: () => onNavigate('Requirements'),
-                ),
-                _SidebarItem(
-                  icon: Icons.verified_user_outlined,
-                  title: 'Eligibility',
-                  isSelected: currentRoute == 'Eligibility',
-                  onTap: () => onNavigate('Eligibility'),
-                ),
-                _SidebarItem(
                   icon: Icons.chat_bubble_outline,
                   title: 'Inquiries',
                   isSelected: currentRoute == 'Inquiries',
                   onTap: () => onNavigate('Inquiries'),
-                ),
-                _SidebarItem(
-                  icon: Icons.people_outline,
-                  title: 'Users',
-                  isSelected: currentRoute == 'Users',
-                  onTap: () => onNavigate('Users'),
                 ),
                 _SidebarItem(
                   icon: Icons.assignment_turned_in_outlined,
@@ -79,12 +61,6 @@ class AdminSidebar extends StatelessWidget {
                   title: 'Documents',
                   isSelected: currentRoute == 'Documents',
                   onTap: () => onNavigate('Documents'),
-                ),
-                _SidebarItem(
-                  icon: Icons.settings_outlined,
-                  title: 'Settings',
-                  isSelected: currentRoute == 'Settings',
-                  onTap: () => onNavigate('Settings'),
                 ),
               ],
             ),
