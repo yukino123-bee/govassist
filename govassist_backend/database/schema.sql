@@ -86,7 +86,8 @@ CREATE TABLE IF NOT EXISTS users (
     address TEXT DEFAULT NULL,
     civil_status VARCHAR(50) DEFAULT NULL,
     contact_number VARCHAR(50) DEFAULT NULL,
-    valid_id_path VARCHAR(255) DEFAULT NULL
+    valid_id_path VARCHAR(255) DEFAULT NULL,
+    profile_picture VARCHAR(255) DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS notifications (

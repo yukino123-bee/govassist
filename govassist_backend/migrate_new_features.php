@@ -8,7 +8,8 @@ try {
     ADD COLUMN address TEXT DEFAULT NULL,
     ADD COLUMN civil_status VARCHAR(50) DEFAULT NULL,
     ADD COLUMN contact_number VARCHAR(50) DEFAULT NULL,
-    ADD COLUMN valid_id_path VARCHAR(255) DEFAULT NULL");
+    ADD COLUMN valid_id_path VARCHAR(255) DEFAULT NULL,
+    ADD COLUMN profile_picture VARCHAR(255) DEFAULT NULL");
     echo "Users table altered successfully.\n";
 } catch(PDOException $e) {
     echo "Error altering users: " . $e->getMessage() . "\n";
