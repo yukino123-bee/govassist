@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/theme.dart';
-import 'screens/auth/login_screen.dart';
+import 'screens/splash_screen.dart';
 
 import 'core/translations.dart';
 
@@ -31,7 +31,7 @@ class GovAssistApp extends StatelessWidget {
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
               themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-              home: const LoginScreen(),
+              home: const SplashScreen(),
             );
           }
         );

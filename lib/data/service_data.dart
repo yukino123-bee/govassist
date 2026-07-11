@@ -6,12 +6,21 @@ import '../models/uploaded_document_model.dart';
 import '../models/announcement_model.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ServiceData {
   // Production Backend URL
   static const String baseUrl = 'http://govassist.atwebpages.com';
 
   static String? _token;
+
+  static void setToken(String token) {
+    _token = token;
+  }
+
+  static void clearToken() {
+    _token = null;
+  }
 
   static Map<String, String> get _headers {
     final headers = {'Content-Type': 'application/json'};
@@ -496,6 +505,8 @@ class ServiceData {
       if (response.statusCode == 200 && data['success'] == true) {
         if (data['token'] != null) {
           _token = data['token'];
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('auth_token', _token!);
         }
         return {'success': true, 'user': data['user']};
       } else {

@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (mounted) {
       if (result['success'] == true) {
-        UserSession().setUser(result['user']);
+        await UserSession().setUser(result['user']);
 
         if (mounted) {
           Navigator.pushReplacement(
@@ -55,8 +55,12 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
       } else {
+        String errorMsg = result['error'] ?? 'Login failed'.tr();
+        if (errorMsg.contains('TimeoutException')) {
+          errorMsg = 'Server is busy or taking too long. Please try again.';
+        }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['error'] ?? 'Login failed'.tr())),
+          SnackBar(content: Text(errorMsg)),
         );
       }
     }

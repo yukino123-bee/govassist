@@ -11,6 +11,7 @@ import '../../data/service_data.dart';
 import '../../models/service_model.dart';
 import 'package:intl/intl.dart';
 import 'admin_analytics_screen.dart';
+import '../auth/login_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -22,9 +23,13 @@ class AdminDashboardScreen extends StatefulWidget {
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   String _currentRoute = 'Dashboard';
 
-  void _logout() {
-    UserSession().clearSession();
-    Navigator.of(context).pushReplacementNamed('/login');
+  void _logout() async {
+    await UserSession().clearSession();
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    }
   }
 
   @override

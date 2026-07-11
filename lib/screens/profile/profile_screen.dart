@@ -319,9 +319,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: ElevatedButton(
                       onPressed: () async {
                         // Clear user session and shared preferences
-                        UserSession().clearSession();
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.clear();
+                        await UserSession().clearSession();
                         
                         if (context.mounted) {
                           Navigator.pushAndRemoveUntil(
